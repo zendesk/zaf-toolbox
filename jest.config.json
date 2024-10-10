@@ -1,0 +1,33 @@
+{
+    "coverageDirectory": "./coverage",
+    "coverageProvider": "v8",
+    "globals": {
+        "DEVELOPMENT": false
+    },
+    "testMatch": ["**/__tests__/**/*.spec.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
+    "transform": {
+        "^.+\\.tsx?$": [
+            "ts-jest",
+            {
+                "tsconfig": "__tests__/tsconfig.json"
+            }
+        ]
+    },
+    "transformIgnorePatterns": [
+        "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+        "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "moduleNameMapper": {
+        "^@errors/(.*)$": "<rootDir>/src/errors/$1",
+        "^@models/(.*)$": "<rootDir>/src/models/$1",
+        "^@services/(.*)$": "<rootDir>/src/services/$1",
+        "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+        "^@tests/(.*)$": "<rootDir>/__tests__/$1"
+    },
+    "setupFilesAfterEnv": ["@testing-library/jest-dom"],
+    "resetMocks": false,
+    "clearMocks": true,
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "moduleFileExtensions": ["js", "ts", "tsx", "json"]
+}

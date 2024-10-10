@@ -1,0 +1,30 @@
+{
+    "ts-node": {
+        "files": true
+    },
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "commonjs",
+        "outDir": "lib",
+        "rootDir": ".",
+
+        "strict": true,
+        "declaration": true,
+        "composite": true,
+        "moduleResolution": "node",
+        "baseUrl": "./src",
+        "esModuleInterop": true,
+        "lib": ["es6", "dom", "esnext"],
+
+        "paths": {
+            "@errors/*": ["errors/*"],
+            "@models/*": ["models/*"],
+            "@services/*": ["services/*"],
+            "@utils/*": ["utils/*"]
+        },
+        "types": ["node"]
+    },
+    "include": ["src/**/*"],
+    "exclude": ["lib"],
+    "moduleDirectories": ["node_modules", "<rootDir>/node_modules", "."]
+}
