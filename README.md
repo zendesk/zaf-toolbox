@@ -2,7 +2,7 @@
 
 ## About
 
-Zendesk labs Toolbox, a project developed with 🩷 by **Zendesk Labs**. This toolbox is designed to accelerate the development of applications within the **Zendesk Apps Framework (ZAF)**.
+ZAF Toolbox, a project developed with 🩷 by **Zendesk Labs**. This toolbox is designed to accelerate the development of applications within the **Zendesk Apps Framework (ZAF)**.
 
 > At **Zendesk Labs**, we focus on innovation and experimentation rather than production-level outputs. Our mission is to > create functional tools and solutions that enhance the ZAF application development experience. While this project is a work > in progress and may not be fully polished or bulletproof, we are committed to improving its stability every day. We welcome contributions from everyone! If you’re interested in helping us enhance this toolbox, your input and collaboration are greatly appreciated.
 
