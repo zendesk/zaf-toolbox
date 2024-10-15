@@ -35,7 +35,7 @@
         "@errors": "lib/errors"
     },
     "dependencies": {
-        "@zendeskgarden/react-theming": "^8.76.8",
+        "@zendeskgarden/react-theming": "^9.0.0",
         "react": "^16.14.0"
     },
     "peerDependencies": {
