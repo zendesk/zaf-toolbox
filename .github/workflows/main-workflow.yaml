@@ -1,0 +1,34 @@
+name: Main workflow
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "src/*"
+            - "**.json"
+jobs:
+    get_version:
+        name: Retrieve version
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.package_version.outputs.version }}
+        steps:
+            - uses: zendesk/checkout@v4
+            - name: Get Package version
+              id: package_version
+              run: |
+                  echo "Reading package.json"
+                  PACKAGE_VERSION=$(cat ./package.json | jq '.version' | tr -d '"')
+                  echo "version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+    create-release:
+        name: Create release
+        runs-on: ubuntu-latest
+        needs:
+            - get_version
+        env:
+            VERSION: ${{ needs.get_version.outputs.version }}
+            GH_TOKEN: ${{ github.token }}
+        steps:
+            - name: Create release
+              run: |
+                  gh release create ${{ env.VERSION }} -R '${{ github.repository }}' --generate-notes

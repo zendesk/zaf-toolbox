@@ -1,0 +1,30 @@
+name: Bump server version
+on:
+    pull_request:
+        paths:
+            - "src/*"
+            - "**.yaml"
+            - "**.ts"
+            - "**.json"
+            - "!.github/*"
+        types:
+            - unlabeled
+            - labeled
+            - synchronize
+            - opened
+            - reopened
+
+env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+    bump-version:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: zendesk/checkout@v4
+
+            - name: Bump version
+              uses: zendesk/bump-version-using-labels@v1.5.0
+              with:
+                  file_path: "package.json"
+                  comment: true

@@ -1,0 +1,33 @@
+name: Size a PR
+on:
+    pull_request:
+
+jobs:
+    pr_size:
+        name: Label the PR size
+        runs-on: ubuntu-latest
+        if: always()
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: zendesk/checkout@v4
+
+            - uses: zendesk/pr-size-labeler@main
+              with:
+                  GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+                  xs_label: "size: XS"
+                  xs_max_size: "10"
+                  s_label: "size: S"
+                  s_max_size: "100"
+                  m_label: "size: M"
+                  m_max_size: "250"
+                  l_label: "size: L"
+                  l_max_size: "500"
+                  xl_label: "size: XL"
+                  fail_if_xl: "true"
+                  message_if_xl: >
+                      This PR is so big! Please, split it 😊
+                  # We can't exclude folder for now (ref: https://github.com/CodelyTV/pr-size-labeler/issues/38)
+                  # If we want to exclude a file we don't need to include the path. Just the fileName is enough.
+                  # Instead of "./server/openapi/oas-1.yml OR ./openapi/oas-1.yml" JUST "oas-1.yml" is enough
+                  files_to_ignore: "package-lock.json"

@@ -1,0 +1,175 @@
+name: Lint, build, test
+on:
+    pull_request:
+        paths:
+            - ".prettierrc"
+            - "**.ts"
+            - "**.json"
+            - "openapi/*.yaml"
+jobs:
+    pre_workflow:
+        name: Pre-workflow clean up
+        runs-on: ubuntu-latest
+        if: github.event.action == 'synchronize'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        permissions:
+            pull-requests: write
+        steps:
+            - name: Dismiss Bot review
+              run: |
+                  reviews=$( gh api /repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews | jq -r '.[] | if (.state == "APPROVED" and .user.type == "Bot") then .id else empty end' )
+
+                  for reviewId in $reviews
+                  do
+                    gh api --method PUT /repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/$reviewId/dismissals -f message="Dismiss bot." -f event="DISMISS" --silent
+                  done
+            - name: Clean Bot comment
+              run: |
+                  # Find all comments in the pr
+                  comments=$( gh api /repos/${{ github.repository }}/issues/${{ github.event.number }}/comments | jq -r '.[] | if .user.login == "github-actions[bot]" then .id else empty end' )
+
+                  for commentId in $comments
+                  do
+                      gh api --method DELETE /repos/${{ github.repository }}/issues/comments/$commentId --silent
+                  done
+            - name: Checkout code
+              uses: zendesk/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check if we need to remove the approvals
+              if: ${{ github.event.before != github.event.after && github.event.before != '' }}
+              run: |
+                  # Capture all commits from head to previous commit
+                  # Convert output to an array of commit hashes
+                  # Iterate through each commit
+                  commits=$( git rev-list --ancestry-path ${{ github.event.before }}..${{ github.event.after }} )
+                  readarray -t commit_hashes <<< "$commits"
+                  for commit_hash in "${commit_hashes[@]}"; do
+                    # Getting the commit
+                    commit=$( gh api /repos/${{ github.repository }}/commits/$commit_hash )
+
+                    # Type of User who trigger the update
+                    committerType=$(jq -r -n --argjson data "$commit" '$data.committer.type')
+
+                    # Number of parents the commit has
+                    # 1 parent, classic commit
+                    # 2 parent it's a merge commit
+                    parentLength=$(jq -n --argjson data "$commit" '$data.parents | length')
+
+                    # Dismiss Logic
+                    # If it's a User that push a commit we dismiss
+                    # Break out of the loop if it's a user commit
+                    # Everything else we don't ( Bot pushed / Bot merged / User Merged )
+                    if [[ $committerType == "User" && $parentLength == 1 ]]; then
+
+                        # Bot is going to list all review and dismiss one by one
+                        # And get id from review who approved the change
+                        reviews=$( gh api /repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews | jq -r '.[] | if .state == "APPROVED" then .id else empty end' )
+
+                        # For each reviewId we need to dismiss
+                        for reviewId in $reviews
+                        do
+                            gh api --method PUT /repos/${{ github.repository }}/pulls/${{ github.event.number }}/reviews/$reviewId/dismissals -f message="Please, I need your help and look at this code again! :eyes:" -f event="DISMISS" --silent
+                        done
+                        break
+                    fi
+                  done
+    lint:
+        name: Lint the API
+        runs-on: ubuntu-latest
+        outputs:
+            job_name: "Lint and verify code formatting in the API"
+        steps:
+            - uses: zendesk/checkout@v4
+            - uses: zendesk/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
+            - name: Install dependencies
+              run: npm ci
+            - name: Execute linter
+              run: npm run lint
+            - name: Validate code format with prettier
+              run: npm run prettier
+    build:
+        name: Build package
+        runs-on: ubuntu-latest
+        outputs:
+            job_name: "Build package"
+        steps:
+            - uses: zendesk/checkout@v4
+            - uses: zendesk/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build the application
+              run: npm run build
+    test:
+        name: Execute tests
+        runs-on: ubuntu-latest
+        outputs:
+            job_name: "Execute tests"
+        steps:
+            - uses: zendesk/checkout@v4
+            - uses: zendesk/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: "npm"
+                  cache-dependency-path: "package-lock.json"
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Execute the tests
+              run: npm run test:ci
+    pr_review:
+        name: Bot reviewer
+        if: always()
+        needs:
+            - pre_workflow
+            - lint
+            - build
+            - test
+        runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ github.token }}
+        permissions:
+            pull-requests: write
+        steps:
+            - name: Failure -> Request changes
+              if: ${{ needs.build.result == 'failure' || needs.lint.result == 'failure' }}
+              env:
+                  MSG_FILE: "msg.txt"
+                  JOBS_REQUEST_FILE: "jobs_rq.json"
+              run: |
+                  gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs --paginate >> ${{ env.JOBS_REQUEST_FILE }}
+
+                  echo "Sorry...:sweat: The following steps failed:" >> ${{ env.MSG_FILE }}
+
+                  if [[ "${{ needs.build.result }}" == "failure" ]]; then
+                     url=$(jq -r --arg job_name "${{ needs.build.outputs.job_name }}" '.jobs | map(select(.name == $job_name)) | .[0].html_url' ${{ env.JOBS_REQUEST_FILE }})
+
+                     echo " * [${{ needs.build.outputs.job_name }}]($url)" >> ${{ env.MSG_FILE }};
+                  fi
+                  if [[ "${{ needs.lint.result }}" == "failure" ]]; then
+                     url=$(jq -r --arg job_name "${{ needs.lint.outputs.job_name }}" '.jobs | map(select(.name == $job_name)) | .[0].html_url' ${{ env.JOBS_REQUEST_FILE }})
+
+                     echo " * [${{ needs.lint.outputs.job_name }}]($url)" >> ${{ env.MSG_FILE }};
+                  fi
+                  if [[ "${{ needs.test.result }}" == "failure" ]]; then
+                     url=$(jq -r --arg job_name "${{ needs.test.outputs.job_name }}" '.jobs | map(select(.name == $job_name)) | .[0].html_url' ${{ env.JOBS_REQUEST_FILE }})
+
+                     echo " * [${{ needs.test.outputs.job_name }}]($url)" >> ${{ env.MSG_FILE }};
+                  fi
+
+                  gh pr review ${{ github.event.pull_request.number }} -r -F ${{ env.MSG_FILE }} -R ${{ github.repository }}
+            - name: Succeed -> Approve changes
+              if: ${{ needs.build.result == 'success' && needs.lint.result == 'success' }}
+              run: |
+                  gh pr review ${{ github.event.pull_request.number }} -a -b "LGTM! :robot: :rocket: :fire:" -R ${{ github.repository }}
