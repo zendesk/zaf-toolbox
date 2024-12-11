@@ -23,7 +23,7 @@ export async function createCustomObject(
     settingsName: string,
     customObjectDefinition: ICustomObjectDefinition
 ): Promise<void> {
-    const metadata = await client.metadata<{ [key in typeof settingsName]: string }>();
+    const metadata = await client.metadata<Record<typeof settingsName, string>>();
 
     // Check if config already set
     if (metadata.settings[settingsName] === "true") {
