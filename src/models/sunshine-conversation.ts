@@ -345,10 +345,6 @@ export interface IContentTemplate {
     "type": "template";
     template: {
         /**
-         * WhatsApp namespace to use
-         */
-        "namespace"?: string;
-        /**
          * Name of the template
          */
         name: string;

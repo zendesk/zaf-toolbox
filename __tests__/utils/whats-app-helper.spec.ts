@@ -17,7 +17,6 @@ describe("WhatsAppHelper", () => {
             status: TemplateStatus.APPROVED,
             category: "category"
         };
-        const namespaceSample = "namespace";
         const componentParametersSample: ITemplateComponentParameters[] = [
             {
                 "type": TemplateComponentTypes.body,
@@ -26,12 +25,11 @@ describe("WhatsAppHelper", () => {
         ];
 
         it("should return a valid IContentTemplate", () => {
-            const content = convertToContent(namespaceSample, templateSample, componentParametersSample);
+            const content = convertToContent(templateSample, componentParametersSample);
 
             expect(content).toStrictEqual({
                 "type": "template",
                 template: {
-                    "namespace": namespaceSample,
                     name: templateSample.name,
                     language: {
                         policy: "deterministic",

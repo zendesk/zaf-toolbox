@@ -4,14 +4,12 @@ import { IContentTemplate, ITemplate, ITemplateComponentParameters } from "@mode
  * Convert a WhatsApp template into a valid IContent for Sunshine Conversation Api Service
  */
 export function convertToContent(
-    namespace: string,
     template: ITemplate,
     componentParameters: ITemplateComponentParameters[]
 ): IContentTemplate {
     return {
         "type": "template",
         template: {
-            namespace,
             name: template.name,
             language: {
                 policy: "deterministic",
