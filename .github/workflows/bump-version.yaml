@@ -3,10 +3,9 @@ on:
     pull_request:
         paths:
             - "src/*"
-            - "**.yaml"
+            - "**.js"
             - "**.ts"
             - "**.json"
-            - "!.github/*"
         types:
             - unlabeled
             - labeled
