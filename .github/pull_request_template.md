@@ -18,15 +18,15 @@
 
 We are following [this pattern](https://semver.org/) to keep our package version updated. Please add the appropriate label to your Pull requests between the following:
 
--   Version: Major
--   Version: Minor
--   Version: Patch
+- Version: Major
+- Version: Minor
+- Version: Patch
 
 ## Acceptation criteria
 
 <!-- Bullet point list to validate you did not missed anything. Please add the acceptation criterias for your issue.  -->
 
--   [ ] Added the corrected label to my pull request
--   [ ] Added/updated tests impacted by the change
--   [ ] Documentation is up-to-date (README.md / INSTALL.md)
--   [ ] Manually tested?
+- [ ] Added the corrected label to my pull request
+- [ ] Added/updated tests impacted by the change
+- [ ] Documentation is up-to-date (README.md / INSTALL.md)
+- [ ] Manually tested?

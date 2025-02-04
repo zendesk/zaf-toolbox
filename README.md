@@ -12,8 +12,8 @@ ZAF Toolbox, a project developed with 🩷 by **Zendesk Labs**. This toolbox is 
 
 ### Requirements
 
--   Node 18 or higher
--   Add the package into a [ZAF application](https://developer.zendesk.com/documentation/apps/)
+- Node 18 or higher
+- Add the package into a [ZAF application](https://developer.zendesk.com/documentation/apps/)
 
 #### Sunshine Conversation Api Service configuration
 
