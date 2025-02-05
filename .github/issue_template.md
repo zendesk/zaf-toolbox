@@ -18,6 +18,6 @@
 
 ### Issue details
 
--   Command: <!-- zcli apps server -->
--   Version: <!-- your issue might already be fixed with the latest version -->
--   OS: <!-- windows, ubuntu, mac or all -->
+- Command: <!-- zcli apps server -->
+- Version: <!-- your issue might already be fixed with the latest version -->
+- OS: <!-- windows, ubuntu, mac or all -->
