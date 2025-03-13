@@ -40,6 +40,11 @@ interface ITemplateComponentBase {
     "type": TemplateComponentTypes;
 }
 
+interface ITemplateBodyTextNamedParams {
+    param_name: string;
+    example: string;
+}
+
 export interface ITemplateBodyComponent extends ITemplateComponentBase {
     "type": TemplateComponentTypes.body;
     text: string;
@@ -48,7 +53,12 @@ export interface ITemplateBodyComponent extends ITemplateComponentBase {
         // Contains the sample values of all the variable.
         // All the sample values are stored in the first array.
         // Example: body_text: [["another", "sample"]]
-        body_text: string[][];
+        body_text?: string[][];
+        // Contains the sample values of the named variables.
+        // The key is the name of the variable and the value is the sample value.
+        // Example: body_text_named_params: [{param_name: "name", example: "sample"}]
+        body_text_named_params?: ITemplateBodyTextNamedParams[];
+        // Depending on the way of creation of the template, the `body_text` or `body_text_named_params` will be provided.
     };
 }
 
