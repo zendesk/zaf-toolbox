@@ -171,6 +171,7 @@ interface ITemplateParameterBase {
 
 export interface ITemplateTextParameter extends ITemplateParameterBase {
     type: "text";
+    parameter_name?: string;
     text: string;
 }
 
