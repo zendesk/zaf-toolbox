@@ -24,7 +24,7 @@
         "^@utils/(.*)$": "<rootDir>/src/utils/$1",
         "^@tests/(.*)$": "<rootDir>/__tests__/$1"
     },
-    "setupFilesAfterEnv": ["@testing-library/jest-dom"],
+    "setupFilesAfterEnv": ["<rootDir>/jest-setup.js", "@testing-library/jest-dom"],
     "resetMocks": false,
     "clearMocks": true,
     "preset": "ts-jest",
