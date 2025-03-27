@@ -206,7 +206,7 @@ export class SunshineConversationApiService {
         phoneNumber: string,
         message: IContent,
         metadata?: IMetadata
-    ): Promise<ISendNotificationResponse> {
+    ): Promise<string> {
         // Validation of the phone number.
         if (!phoneNumber.match(INTERNATIONAL_PHONE_NUMBER_REGEX)) {
             throw SyntaxError("Phone number should follow this format: +<dial_code><number>");
@@ -234,8 +234,10 @@ export class SunshineConversationApiService {
             ...(metadata && { metadata })
         };
 
-        return await this.client.request<unknown, ISendNotificationResponse>(
-            this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
-        );
+        return (
+            await this.client.request<unknown, ISendNotificationResponse>(
+                this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
+            )
+        ).notification._id;
     }
 }

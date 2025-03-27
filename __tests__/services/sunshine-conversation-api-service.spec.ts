@@ -441,12 +441,14 @@ describe("SunshineConversationApiService", () => {
             );
 
             expect(client.request).toHaveBeenCalledWith(options);
-            expect(res).toStrictEqual({
-                notification: { _id: "819580915u1514141g" }
-            });
+            expect(res).toStrictEqual("819580915u1514141g");
         });
 
         it("should call the API without messageSchema when WhatsApp channel is not used", async () => {
+            client.request.mockResolvedValueOnce({
+                notification: { _id: "819580915u1514141g" }
+            });
+
             const options = {
                 url: `https://api.smooch.io/v1.1/apps/suncoAppId/notifications`,
                 type: HttpMethod.POST,
@@ -489,6 +491,10 @@ describe("SunshineConversationApiService", () => {
         });
 
         it("should include metadata if provided", async () => {
+            client.request.mockResolvedValueOnce({
+                notification: { _id: "819580915u1514141g" }
+            });
+
             const metadata = { foo: "bar" };
             const options = {
                 url: `https://api.smooch.io/v1.1/apps/suncoAppId/notifications`,
