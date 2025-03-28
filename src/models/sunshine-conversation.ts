@@ -417,6 +417,10 @@ export interface ISendNotificationPayload {
     metadata?: IMetadata;
 }
 
+export interface ISendNotificationResponse {
+    notification: { _id: string };
+}
+
 // ====
 
 /**
