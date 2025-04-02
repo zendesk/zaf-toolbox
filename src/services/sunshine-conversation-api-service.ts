@@ -234,10 +234,10 @@ export class SunshineConversationApiService {
             ...(metadata && { metadata })
         };
 
-        return (
-            await this.client.request<unknown, ISendNotificationResponse>(
-                this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
-            )
-        ).notification._id;
+        const { responseJSON } = await this.client.request<unknown, ISendNotificationResponse>(
+            this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
+        );
+
+        return responseJSON.notification._id;
     }
 }

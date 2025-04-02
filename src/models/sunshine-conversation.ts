@@ -418,7 +418,9 @@ export interface ISendNotificationPayload {
 }
 
 export interface ISendNotificationResponse {
-    notification: { _id: string };
+    responseJSON: {
+        notification: { _id: string };
+    };
 }
 
 // ====
