@@ -418,7 +418,7 @@ describe("SunshineConversationApiService", () => {
 
         it("should call the API", async () => {
             client.request.mockResolvedValueOnce({
-                notification: { _id: "819580915u1514141g" }
+                responseJSON: { notification: { _id: "819580915u1514141g" } }
             });
 
             const options = {
@@ -446,7 +446,7 @@ describe("SunshineConversationApiService", () => {
 
         it("should call the API without messageSchema when WhatsApp channel is not used", async () => {
             client.request.mockResolvedValueOnce({
-                notification: { _id: "819580915u1514141g" }
+                responseJSON: { notification: { _id: "819580915u1514141g" } }
             });
 
             const options = {
@@ -492,7 +492,7 @@ describe("SunshineConversationApiService", () => {
 
         it("should include metadata if provided", async () => {
             client.request.mockResolvedValueOnce({
-                notification: { _id: "819580915u1514141g" }
+                responseJSON: { notification: { _id: "819580915u1514141g" } }
             });
 
             const metadata = { foo: "bar" };
