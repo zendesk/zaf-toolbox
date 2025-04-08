@@ -144,7 +144,11 @@ export interface ITemplatesResponse {
     after?: string;
 }
 
-export interface ICreateTemplateResponse extends ICreateTemplate {
+export interface ICreateTemplateResponse {
+    responseJson: IMessageTemplate;
+}
+
+interface IMessageTemplate extends ICreateTemplate {
     messageTemplate: { status: TemplateStatus; id: string };
 }
 

@@ -296,8 +296,10 @@ describe("SunshineConversationApiService", () => {
                 };
 
                 const response: ICreateTemplateResponse = {
-                    ...payload,
-                    messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
+                    responseJson: {
+                        ...payload,
+                        messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
+                    }
                 };
                 client.request.mockResolvedValueOnce(response);
 
