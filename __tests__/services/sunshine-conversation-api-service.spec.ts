@@ -321,7 +321,7 @@ describe("SunshineConversationApiService", () => {
                 );
 
                 expect(client.request).toHaveBeenCalledWith(options);
-                expect(template).toBe(response);
+                expect(template).toBe(response.responseJson);
             });
         });
 
