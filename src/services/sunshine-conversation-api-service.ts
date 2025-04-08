@@ -8,14 +8,15 @@ import {
     ITemplate,
     ICreateTemplate,
     ITemplatesResponse,
-    ICreateTemplateResponse,
+    IResponse,
     UserChannelTypes,
     ISendNotificationPayload,
     IIntegration,
     ISunshineConversationPageParameters,
     ISunshineConversationGetIntegrationsFilters,
     IMetadata,
-    ISendNotificationResponse
+    ISendNotificationResponse,
+    IMessageTemplate
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
@@ -176,13 +177,13 @@ export class SunshineConversationApiService {
     public async createWhatsAppTemplate(
         whatsAppIntegrationId: string,
         createTemplateBody: ICreateTemplate
-    ): Promise<ICreateTemplateResponse> {
+    ): Promise<IMessageTemplate> {
         const options = this.createV1Options(
             `/apps/${this.settings.appId}/integrations/${whatsAppIntegrationId}/messageTemplates`,
             HttpMethod.POST,
             createTemplateBody
         );
-        return this.client.request(options);
+        return (await this.client.request<unknown, IResponse<IMessageTemplate>>(options)).responseJson;
     }
 
     /**
