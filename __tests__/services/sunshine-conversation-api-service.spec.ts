@@ -11,7 +11,7 @@ import {
     IServiceConfig,
     UserChannelTypes
 } from "@models/sunshine-conversation";
-import { ICreateTemplate, ICreateTemplateResponse, ITemplate, TemplateStatus } from "@models/whats-app-template";
+import { ICreateTemplate, IMessageTemplate, IResponse, ITemplate, TemplateStatus } from "@models/whats-app-template";
 import { SunshineConversationApiService } from "@services/sunshine-conversation-api-service";
 
 describe("SunshineConversationApiService", () => {
@@ -295,7 +295,7 @@ describe("SunshineConversationApiService", () => {
                     category: "category"
                 };
 
-                const response: ICreateTemplateResponse = {
+                const response: IResponse<IMessageTemplate> = {
                     responseJson: {
                         ...payload,
                         messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
