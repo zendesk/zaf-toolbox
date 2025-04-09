@@ -11,7 +11,7 @@ import {
     IServiceConfig,
     UserChannelTypes
 } from "@models/sunshine-conversation";
-import { ICreateTemplate, ICreateTemplateResponse, ITemplate, TemplateStatus } from "@models/whats-app-template";
+import { ICreateTemplate, IMessageTemplate, IResponse, ITemplate, TemplateStatus } from "@models/whats-app-template";
 import { SunshineConversationApiService } from "@services/sunshine-conversation-api-service";
 
 describe("SunshineConversationApiService", () => {
@@ -295,9 +295,11 @@ describe("SunshineConversationApiService", () => {
                     category: "category"
                 };
 
-                const response: ICreateTemplateResponse = {
-                    ...payload,
-                    messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
+                const response: IResponse<IMessageTemplate> = {
+                    responseJSON: {
+                        ...payload,
+                        messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
+                    }
                 };
                 client.request.mockResolvedValueOnce(response);
 
@@ -319,7 +321,7 @@ describe("SunshineConversationApiService", () => {
                 );
 
                 expect(client.request).toHaveBeenCalledWith(options);
-                expect(template).toBe(response);
+                expect(template).toBe(response.responseJSON);
             });
         });
 
