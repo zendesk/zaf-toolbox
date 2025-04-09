@@ -145,7 +145,7 @@ export interface ITemplatesResponse {
 }
 
 export interface IResponse<T> {
-    responseJson: T;
+    responseJSON: T;
 }
 
 export interface IMessageTemplate extends ICreateTemplate {

@@ -296,7 +296,7 @@ describe("SunshineConversationApiService", () => {
                 };
 
                 const response: IResponse<IMessageTemplate> = {
-                    responseJson: {
+                    responseJSON: {
                         ...payload,
                         messageTemplate: { status: TemplateStatus.APPROVED, id: "id" }
                     }
@@ -321,7 +321,7 @@ describe("SunshineConversationApiService", () => {
                 );
 
                 expect(client.request).toHaveBeenCalledWith(options);
-                expect(template).toBe(response.responseJson);
+                expect(template).toBe(response.responseJSON);
             });
         });
 

@@ -15,8 +15,8 @@ import {
     ISunshineConversationPageParameters,
     ISunshineConversationGetIntegrationsFilters,
     IMetadata,
-    ISendNotificationResponse,
-    IMessageTemplate
+    IMessageTemplate,
+    ISendNotification
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
@@ -183,7 +183,7 @@ export class SunshineConversationApiService {
             HttpMethod.POST,
             createTemplateBody
         );
-        return (await this.client.request<unknown, IResponse<IMessageTemplate>>(options)).responseJson;
+        return (await this.client.request<unknown, IResponse<IMessageTemplate>>(options)).responseJSON;
     }
 
     /**
@@ -235,7 +235,7 @@ export class SunshineConversationApiService {
             ...(metadata && { metadata })
         };
 
-        const { responseJSON } = await this.client.request<unknown, ISendNotificationResponse>(
+        const { responseJSON } = await this.client.request<unknown, IResponse<ISendNotification>>(
             this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
         );
 
