@@ -10,7 +10,15 @@ import {
     IUserFieldsResults,
     IZendeskUserField,
     IZendeskUserFieldValue,
-    HttpMethod
+    HttpMethod,
+    ITagsResults,
+    IZendeskTagsResults,
+    IGroupsResults,
+    IZendeskGroupsResults,
+    IZendeskOrganizationsResults,
+    IOrganizationsResults,
+    IZendeskLocalesResults,
+    ILocalesResults
 } from "@models/index";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -113,10 +121,7 @@ export class ZendeskApiService {
             }
         }
 
-        return results
-            .flat()
-            .map(({ users }) => users)
-            .flat();
+        return results.map(({ users }) => users).flat();
     }
 
     /**
@@ -137,10 +142,7 @@ export class ZendeskApiService {
             }
         }
 
-        return results
-            .flat()
-            .map(({ user_fields }) => user_fields)
-            .flat();
+        return results.map(({ user_fields }) => user_fields).flat();
     }
 
     /**
@@ -208,5 +210,85 @@ export class ZendeskApiService {
                 }
             }
         });
+    }
+    /**
+     * Fetch all user instance tags
+     */
+    public async getTags(fetchAllTags = true): Promise<IZendeskTagsResults[]> {
+        const results = [await this.client.request<string, ITagsResults>(`/api/v2/tags`)];
+
+        if (fetchAllTags) {
+            while (true) {
+                const nextPage = results[results.length - 1].next_page;
+
+                if (!nextPage) {
+                    break;
+                }
+
+                results.push(await this.client.request<string, ITagsResults>(nextPage));
+            }
+        }
+
+        return results.map(({ tags }) => tags).flat();
+    }
+    /**
+     * Fetch all user instance groups
+     */
+    public async getGroups(fetchAllGroups = true): Promise<IZendeskGroupsResults[]> {
+        const results = [await this.client.request<string, IGroupsResults>(`/api/v2/groups`)];
+
+        if (fetchAllGroups) {
+            while (true) {
+                const nextPage = results[results.length - 1].next_page;
+
+                if (!nextPage) {
+                    break;
+                }
+
+                results.push(await this.client.request<string, IGroupsResults>(nextPage));
+            }
+        }
+
+        return results.map(({ groups }) => groups).flat();
+    }
+    /**
+     * Fetch all user instance organizations
+     */
+    public async getOrganizations(fetchAllOrganizations = true): Promise<IZendeskOrganizationsResults[]> {
+        const results = [await this.client.request<string, IOrganizationsResults>(`/api/v2/organizations`)];
+
+        if (fetchAllOrganizations) {
+            while (true) {
+                const nextPage = results[results.length - 1].next_page;
+
+                if (!nextPage) {
+                    break;
+                }
+
+                results.push(await this.client.request<string, IOrganizationsResults>(nextPage));
+            }
+        }
+
+        return results.map(({ organizations }) => organizations).flat();
+    }
+    /**
+     * Fetch all user instance locales
+     */
+    public async getLocales(fetchAllLocales = true): Promise<IZendeskLocalesResults[]> {
+        const results = [await this.client.request<string, ILocalesResults>(`/api/v2/locales`)];
+
+        if (fetchAllLocales) {
+            while (true) {
+                const nextPage = results[results.length - 1].next_page;
+
+                if (!nextPage) {
+                    break;
+                }
+
+                results.push(await this.client.request<string, ILocalesResults>(nextPage));
+            }
+        }
+
+        return results.map(({ locales }) => locales).flat();
     }
 }

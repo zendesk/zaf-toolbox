@@ -62,6 +62,60 @@ export interface IKeyTitleUserField {
     title: string;
 }
 
+export interface IZendeskTagsResults extends IZendeskResponse {
+    tags: IZendeskTag[];
+}
+
+export interface IZendeskTag {
+    count: number;
+    name: string;
+}
+
+export interface IZendeskGroupsResults extends IZendeskResponse {
+    groups: IZendeskGroup[];
+}
+
+export interface IZendeskGroup {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    is_public: boolean;
+}
+
+export interface IZendeskOrganizationsResults extends IZendeskResponse {
+    organizations: IZendeskOrganizations[];
+}
+
+export interface IZendeskOrganizations {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    domain_names: string[];
+    details: string;
+    notes: string;
+    group_id: number | null;
+    shared_tickets: boolean;
+    shared_comments: boolean;
+    tags: string[];
+    external_id: string | null;
+    url: string;
+}
+
+export interface IZendeskLocalesResults extends IZendeskResponse {
+    locales: IZendeskLocale[];
+}
+
+export interface IZendeskLocale {
+    id: number;
+    name: string;
+    locale: string;
+    created_at: string;
+    updated_at: string;
+    url: string;
+}
+
 interface IZendeskResponse {
     count: number;
     next_page: string | null;
@@ -74,4 +128,20 @@ export interface ISearchUserResults<T = IZendeskUserFieldValue> extends IZendesk
 
 export interface IUserFieldsResults extends IZendeskResponse {
     user_fields: IZendeskUserField[];
+}
+
+export interface ITagsResults extends IZendeskResponse {
+    tags: IZendeskTagsResults;
+}
+
+export interface IGroupsResults extends IZendeskResponse {
+    groups: IZendeskGroupsResults;
+}
+
+export interface IOrganizationsResults extends IZendeskResponse {
+    organizations: IZendeskOrganizationsResults;
+}
+
+export interface ILocalesResults extends IZendeskResponse {
+    locales: IZendeskLocalesResults;
 }

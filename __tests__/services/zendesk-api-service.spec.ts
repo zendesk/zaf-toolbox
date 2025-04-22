@@ -309,6 +309,154 @@ describe("ZendeskService", () => {
                 ).rejects.toThrow(RangeError);
                 expect(requestMock).toHaveBeenCalledTimes(0);
             });
+
+            describe("getTags", () => {
+                it("should call the API and return the tags", async () => {
+                    const tags = [{ name: "tag1" }];
+                    requestMock.mockResolvedValueOnce({ tags });
+
+                    const result = await service.getTags();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/tags`);
+                    expect(result).toEqual(tags);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const tags = [{ name: "tag1" }];
+                    requestMock
+                        .mockResolvedValueOnce({ tags, next_page: "next_page" })
+                        .mockResolvedValueOnce({ tags: [] });
+
+                    const result = await service.getTags();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/tags`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(tags);
+                });
+
+                it("should only call the API one time with fetchAllTags set to false", async () => {
+                    const tags = [{ name: "tag1" }];
+                    requestMock.mockResolvedValueOnce({ tags, next_page: "next_page" });
+
+                    const result = await service.getTags(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/tags`);
+                    expect(result).toEqual(tags);
+                });
+            });
+
+            describe("getGroups", () => {
+                it("should call the API and return the groups", async () => {
+                    const groups = [{ name: "group1" }];
+                    requestMock.mockResolvedValueOnce({ groups });
+
+                    const result = await service.getGroups();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/groups`);
+                    expect(result).toEqual(groups);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const groups = [{ name: "group1" }];
+                    requestMock
+                        .mockResolvedValueOnce({ groups, next_page: "next_page" })
+                        .mockResolvedValueOnce({ groups: [] });
+
+                    const result = await service.getGroups();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/groups`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(groups);
+                });
+
+                it("should only call the API one time with fetchAllGroups set to false", async () => {
+                    const groups = [{ name: "group1" }];
+                    requestMock.mockResolvedValueOnce({ groups, next_page: "next_page" });
+
+                    const result = await service.getGroups(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/groups`);
+                    expect(result).toEqual(groups);
+                });
+            });
+
+            describe("getOrganizations", () => {
+                it("should call the API and return the organizations", async () => {
+                    const organizations = [{ name: "organization1" }];
+                    requestMock.mockResolvedValueOnce({ organizations });
+
+                    const result = await service.getOrganizations();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/organizations`);
+                    expect(result).toEqual(organizations);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const organizations = [{ name: "organization1" }];
+                    requestMock
+                        .mockResolvedValueOnce({ organizations, next_page: "next_page" })
+                        .mockResolvedValueOnce({ organizations: [] });
+
+                    const result = await service.getOrganizations();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/organizations`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(organizations);
+                });
+
+                it("should only call the API one time with fetchAllOrganizations set to false", async () => {
+                    const organizations = [{ name: "organization1" }];
+                    requestMock.mockResolvedValueOnce({ organizations, next_page: "next_page" });
+
+                    const result = await service.getOrganizations(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/organizations`);
+                    expect(result).toEqual(organizations);
+                });
+            });
+
+            describe("getLocales", () => {
+                it("should call the API and return the locales", async () => {
+                    const locales = [{ locale: "en-US" }];
+                    requestMock.mockResolvedValueOnce({ locales });
+
+                    const result = await service.getLocales();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/locales`);
+                    expect(result).toEqual(locales);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const locales = [{ locale: "en-US" }];
+                    requestMock
+                        .mockResolvedValueOnce({ locales, next_page: "next_page" })
+                        .mockResolvedValueOnce({ locales: [] });
+
+                    const result = await service.getLocales();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/locales`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(locales);
+                });
+
+                it("should only call the API one time with fetchAllLocales set to false", async () => {
+                    const locales = [{ locale: "en-US" }];
+                    requestMock.mockResolvedValueOnce({ locales, next_page: "next_page" });
+
+                    const result = await service.getLocales(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/locales`);
+                    expect(result).toEqual(locales);
+                });
+            });
         });
     });
 });
