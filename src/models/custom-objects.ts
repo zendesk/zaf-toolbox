@@ -141,6 +141,10 @@ export interface IListCustomObjectRecordsFilter {
     sort?: ListCutomObjectRecordsSortingOptions;
 }
 
+export interface ISearchCustomObjectRecordsFilter extends IListCustomObjectRecordsFilter {
+    query: string;
+}
+
 export interface ICreateCustomObjectRecordBody<T extends ICustomObjectRecordField> {
     custom_object_fields: T;
     name: string;
