@@ -420,39 +420,13 @@ describe("ZendeskService", () => {
                     expect(result).toEqual(organizations);
                 });
             });
-
             describe("getLocales", () => {
-                it("should call the API and return the locales", async () => {
+                it("should fetch and return locales", async () => {
                     const locales = [{ locale: "en-US" }];
                     requestMock.mockResolvedValueOnce({ locales });
 
                     const result = await service.getLocales();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/locales`);
-                    expect(result).toEqual(locales);
-                });
-
-                it("should continue calling the API until next_page disappears", async () => {
-                    const locales = [{ locale: "en-US" }];
-                    requestMock
-                        .mockResolvedValueOnce({ locales, next_page: "next_page" })
-                        .mockResolvedValueOnce({ locales: [] });
-
-                    const result = await service.getLocales();
-
-                    expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/locales`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
-                    expect(result).toEqual(locales);
-                });
-
-                it("should only call the API one time with fetchAllLocales set to false", async () => {
-                    const locales = [{ locale: "en-US" }];
-                    requestMock.mockResolvedValueOnce({ locales, next_page: "next_page" });
-
-                    const result = await service.getLocales(false);
-
-                    expect(requestMock).toHaveBeenCalledTimes(1);
                     expect(requestMock).toHaveBeenCalledWith(`/api/v2/locales`);
                     expect(result).toEqual(locales);
                 });

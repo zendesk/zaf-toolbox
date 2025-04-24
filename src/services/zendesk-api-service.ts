@@ -143,7 +143,7 @@ export class ZendeskApiService {
      */
     public async getUserFields(fetchAllFields = true): Promise<IZendeskUserField[]> {
         return this.fetchAllPaginatedResults<IUserFieldsResults, IZendeskUserField>(
-            `/api/v2/tags`,
+            `/api/v2/user_fields`,
             fetchAllFields,
             (response) => response.user_fields
         );
