@@ -12,13 +12,13 @@ import {
     IZendeskUserFieldValue,
     HttpMethod,
     ITagsResults,
-    IZendeskTagsResults,
     IGroupsResults,
-    IZendeskGroupsResults,
-    IZendeskOrganizationsResults,
     IOrganizationsResults,
-    IZendeskLocalesResults,
-    ILocalesResults
+    ILocalesResults,
+    IZendeskTag,
+    IZendeskLocale,
+    IZendeskGroup,
+    IZendeskOrganizations
 } from "@models/index";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -31,6 +31,32 @@ export const UPDATE_USER_FIELD_MAX_USERS = 90;
 
 export class ZendeskApiService {
     public constructor(public client: Client) {}
+
+    /**
+     * Generic method to fetch all paginated results from a given endpoint.
+     *
+     * @param url The initial API endpoint URL.
+     * @param fetchAll Whether to fetch all pages or just the first.
+     * @param extractArrayFn Function to extract the array of items from the response.
+     * @returns A promise resolving to a flattened array of all items.
+     */
+    private async fetchAllPaginatedResults<TResponse, TItem>(
+        url: string,
+        fetchAll: boolean,
+        extractArrayFn: (response: TResponse) => TItem[]
+    ): Promise<TItem[]> {
+        const results: TResponse[] = [await this.client.request<string, TResponse>(url)];
+
+        if (fetchAll) {
+            while (true) {
+                const nextPage = (results[results.length - 1] as TResponse & { next_page?: string }).next_page;
+                if (!nextPage) break;
+                results.push(await this.client.request<string, TResponse>(nextPage));
+            }
+        }
+
+        return results.flatMap(extractArrayFn);
+    }
 
     /**
      * Retrieve the requirement id from the requirement file. The identifier is only the name of the requirement.
@@ -103,46 +129,24 @@ export class ZendeskApiService {
      */
     public async searchUsers<T = IZendeskUserFieldValue>(
         query: string,
-        fetchAllPages = true
+        fetchAllUsers = true
     ): Promise<IZendeskUser<T>[]> {
-        const results = [
-            await this.client.request<string, ISearchUserResults<T>>(`/api/v2/users/search?query=${encodeURI(query)}`)
-        ];
-
-        if (fetchAllPages) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, ISearchUserResults<T>>(nextPage));
-            }
-        }
-
-        return results.map(({ users }) => users).flat();
+        return this.fetchAllPaginatedResults<ISearchUserResults<T>, IZendeskUser<T>>(
+            `/api/v2/users/search?query=${encodeURI(query)}`,
+            fetchAllUsers,
+            (response) => response.users
+        );
     }
 
     /**
      * Fetch all user fields
      */
     public async getUserFields(fetchAllFields = true): Promise<IZendeskUserField[]> {
-        const results = [await this.client.request<string, IUserFieldsResults>(`/api/v2/user_fields`)];
-
-        if (fetchAllFields) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, IUserFieldsResults>(nextPage));
-            }
-        }
-
-        return results.map(({ user_fields }) => user_fields).flat();
+        return this.fetchAllPaginatedResults<IUserFieldsResults, IZendeskUserField>(
+            `/api/v2/tags`,
+            fetchAllFields,
+            (response) => response.user_fields
+        );
     }
 
     /**
@@ -214,81 +218,39 @@ export class ZendeskApiService {
     /**
      * Fetch all user instance tags
      */
-    public async getTags(fetchAllTags = true): Promise<IZendeskTagsResults[]> {
-        const results = [await this.client.request<string, ITagsResults>(`/api/v2/tags`)];
-
-        if (fetchAllTags) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, ITagsResults>(nextPage));
-            }
-        }
-
-        return results.map(({ tags }) => tags).flat();
+    public async getTags(fetchAllTags = true): Promise<IZendeskTag[]> {
+        return this.fetchAllPaginatedResults<ITagsResults, IZendeskTag>(
+            `/api/v2/tags`,
+            fetchAllTags,
+            (response) => response.tags
+        );
     }
     /**
      * Fetch all user instance groups
      */
-    public async getGroups(fetchAllGroups = true): Promise<IZendeskGroupsResults[]> {
-        const results = [await this.client.request<string, IGroupsResults>(`/api/v2/groups`)];
-
-        if (fetchAllGroups) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, IGroupsResults>(nextPage));
-            }
-        }
-
-        return results.map(({ groups }) => groups).flat();
+    public async getGroups(fetchAllGroups = true): Promise<IZendeskGroup[]> {
+        return this.fetchAllPaginatedResults<IGroupsResults, IZendeskGroup>(
+            `/api/v2/groups`,
+            fetchAllGroups,
+            (response) => response.groups
+        );
     }
     /**
      * Fetch all user instance organizations
      */
-    public async getOrganizations(fetchAllOrganizations = true): Promise<IZendeskOrganizationsResults[]> {
-        const results = [await this.client.request<string, IOrganizationsResults>(`/api/v2/organizations`)];
-
-        if (fetchAllOrganizations) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, IOrganizationsResults>(nextPage));
-            }
-        }
-
-        return results.map(({ organizations }) => organizations).flat();
+    public async getOrganizations(fetchAllOrganizations = true): Promise<IZendeskOrganizations[]> {
+        return this.fetchAllPaginatedResults<IOrganizationsResults, IZendeskOrganizations>(
+            `/api/v2/organizations`,
+            fetchAllOrganizations,
+            (response) => response.organizations
+        );
     }
     /**
      * Fetch all user instance locales
      */
-    public async getLocales(fetchAllLocales = true): Promise<IZendeskLocalesResults[]> {
-        const results = [await this.client.request<string, ILocalesResults>(`/api/v2/locales`)];
+    public async getLocales(): Promise<IZendeskLocale[]> {
+        const results = await this.client.request<string, ILocalesResults>(`/api/v2/locales`);
 
-        if (fetchAllLocales) {
-            while (true) {
-                const nextPage = results[results.length - 1].next_page;
-
-                if (!nextPage) {
-                    break;
-                }
-
-                results.push(await this.client.request<string, ILocalesResults>(nextPage));
-            }
-        }
-
-        return results.map(({ locales }) => locales).flat();
+        return results.locales;
     }
 }
