@@ -11,7 +11,8 @@ import {
     IListCustomObjectRecordsResponse,
     ICustomObjectRecord,
     ListCutomObjectRecordsSortingOptions,
-    ICustomObjectRecordField
+    ICustomObjectRecordField,
+    ISearchCustomObjectRecordsFilter
 } from "@models/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
 
@@ -140,30 +141,9 @@ export class CustomObjectService {
         key: string,
         sortOptions?: { sort: ListCutomObjectRecordsSortingOptions }
     ): Promise<ICustomObjectRecord<T>[]> {
-        let hasMore = true;
-        let data: IListCustomObjectRecordsFilter = {};
-        let objects: ICustomObjectRecord<T>[] = [];
-
-        do {
-            const response = await this.client.request<any, IListCustomObjectRecordsResponse<T>>({
-                url: `/api/v2/custom_objects/${key}/records`,
-                type: "GET",
-                contentType: CONTENT_TYPE,
-                data
-            });
-
-            objects = [...objects, ...response.custom_object_records];
-
-            hasMore = response.meta.has_more;
-            data = {
-                page: {
-                    after: response.meta.after_cursor
-                },
-                ...sortOptions
-            };
-        } while (hasMore);
-
-        return objects;
+        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records`, {
+            sort: sortOptions?.sort
+        } as IListCustomObjectRecordsFilter);
     }
 
     /**
@@ -236,5 +216,64 @@ export class CustomObjectService {
             type: "DELETE",
             contentType: CONTENT_TYPE
         });
+    }
+
+    /**
+     * Get custom object records by search
+     * The query parameter is used to search text-based fields for records that match specific query terms. The query can be multiple words or numbers. Every record that matches the beginning of any word or number in the query string is returned.
+     * Fuzzy search is supported for the following text-based field types: : Text fields, Multi Line Text fields, and RegExp fields.
+     *
+     * @param key - The custom object key
+     * @param query - The search query
+     * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#search-custom-object-records
+     */
+    public async searchRecords<T extends ICustomObjectRecordField>(key: string, query: string) {
+        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, {
+            query
+        } as ISearchCustomObjectRecordsFilter);
+    }
+
+    /**
+     * Generic method to fetch all records using pagination
+     *
+     * @param url - The API endpoint URL
+     * @param initialData - Initial request data
+     * @param getNextPageData - Function to build the next page request data
+     * @returns Array of all fetched records
+     */
+    private async fetchAllPaginatedRecords<T extends ICustomObjectRecordField>(
+        url: string,
+        initialData: IListCustomObjectRecordsFilter
+    ): Promise<ICustomObjectRecord<T>[]> {
+        let hasMore = true;
+        let data = initialData;
+        let objects: ICustomObjectRecord<T>[] = [];
+
+        do {
+            const response = await this.client.request<any, IListCustomObjectRecordsResponse<T>>({
+                url,
+                type: "GET",
+                contentType: CONTENT_TYPE,
+                data
+            });
+
+            objects = [...objects, ...response.custom_object_records];
+
+            hasMore = response.meta.has_more;
+            if (hasMore) {
+                data = {
+                    page: {
+                        after: response.meta.after_cursor
+                    },
+                    ...(initialData.sort
+                        ? {
+                              sort: initialData.sort
+                          }
+                        : undefined)
+                } as IListCustomObjectRecordsFilter;
+            }
+        } while (hasMore);
+
+        return objects;
     }
 }

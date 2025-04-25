@@ -326,5 +326,66 @@ describe("CustomObjectService", () => {
             });
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
+
+        it("should call Zendesk API with search query", async () => {
+            requestMock.mockResolvedValueOnce({
+                custom_object_records: [customObjectRecord],
+                meta: {
+                    has_more: false
+                }
+            });
+
+            await service.searchRecords("foo", "search_query");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records/search`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    query: "search_query"
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("should keep sort threw all pages ", async () => {
+            requestMock
+                .mockResolvedValueOnce({
+                    custom_object_records: [customObjectRecord],
+                    meta: {
+                        has_more: true,
+                        after_cursor: "1"
+                    }
+                })
+                .mockResolvedValueOnce({
+                    custom_object_records: [customObjectRecord],
+                    meta: {
+                        has_more: false
+                    }
+                });
+
+            await service.retrieveAllCustomObjectRecords("foo", { sort: ListCutomObjectRecordsSortingOptions.ID });
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    sort: "id"
+                }
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: `/api/v2/custom_objects/foo/records`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    page: {
+                        after: "1"
+                    },
+                    sort: "id"
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(2);
+        });
     });
 });
