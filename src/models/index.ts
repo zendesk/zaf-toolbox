@@ -8,3 +8,4 @@ export * from "@models/requester";
 export * from "@models/whats-app-template";
 export * from "@models/zendesk-user";
 export * from "@models/custom-objects";
+export * from "@models/zendesk-api";

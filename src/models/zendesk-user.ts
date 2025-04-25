@@ -1,3 +1,5 @@
+import { IZendeskResponse } from "./zendesk-api";
+
 export interface IZendeskUser<T = IZendeskUserFieldValue> {
     id: number;
     url: string;
@@ -60,12 +62,6 @@ export interface IZendeskUserField {
 export interface IKeyTitleUserField {
     key: string;
     title: string;
-}
-
-interface IZendeskResponse {
-    count: number;
-    next_page: string | null;
-    previous_page: string | null;
 }
 
 export interface ISearchUserResults<T = IZendeskUserFieldValue> extends IZendeskResponse {
