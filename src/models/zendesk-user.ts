@@ -43,6 +43,19 @@ export interface IZendeskUser<T = IZendeskUserFieldValue> {
 
 export type IZendeskUserFieldValue = Record<string, string | number | boolean>;
 
+export enum ZendeskUserFieldType {
+    Text = "text",
+    Textarea = "textarea",
+    Checkbox = "checkbox",
+    Date = "date",
+    Integer = "integer",
+    Decimal = "decimal",
+    Regexp = "regexp",
+    Dropdown = "dropdown",
+    Lookup = "lookup",
+    Multiselect = "multiselect"
+}
+
 export interface IZendeskUserField {
     active?: boolean;
     created_at?: string;
@@ -54,7 +67,7 @@ export interface IZendeskUserField {
     raw_title?: string;
     regexp_for_validation?: string;
     title: string;
-    "type": string;
+    "type": ZendeskUserFieldType;
     updated_at?: string;
     url?: string;
 }
