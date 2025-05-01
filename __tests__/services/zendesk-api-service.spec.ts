@@ -1,5 +1,13 @@
 import { NotFoundError } from "@errors/not-found-error";
-import { Capabilities, HttpMethod, IContentText, IRequirement, IZendeskUser, IZendeskUserField } from "@models/index";
+import {
+    Capabilities,
+    HttpMethod,
+    IContentText,
+    IRequirement,
+    IZendeskUser,
+    IZendeskUserField,
+    ZendeskUserFieldType
+} from "@models/index";
 import { UPDATE_USER_FIELD_MAX_USERS, ZendeskApiService } from "@services/zendesk-api-service";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
@@ -190,7 +198,7 @@ describe("ZendeskService", () => {
 
         const userFieldSample: IZendeskUserField = {
             title: "title",
-            "type": "type",
+            "type": ZendeskUserFieldType.Text,
             key: "key"
         };
 
