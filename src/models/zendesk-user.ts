@@ -56,6 +56,13 @@ export enum ZendeskUserFieldType {
     Multiselect = "multiselect"
 }
 
+export interface IZendeskUserFieldOptions {
+    id: number;
+    name: string;
+    raw_name: string;
+    value: string;
+}
+
 export interface IZendeskUserField {
     active?: boolean;
     created_at?: string;
@@ -70,6 +77,7 @@ export interface IZendeskUserField {
     "type": ZendeskUserFieldType;
     updated_at?: string;
     url?: string;
+    custom_field_options?: IZendeskUserFieldOptions[];
 }
 
 export interface IKeyTitleUserField {
