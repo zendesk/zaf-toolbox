@@ -551,6 +551,7 @@ export interface IIntegrationMessenger extends IIntegrationBase {
 export interface IIntegrationTwilio extends IIntegrationBase {
     type: UserChannelTypes.Twilio;
     phoneNumber: string;
+    isTalk?: boolean;
 }
 
 export interface IIntegrationTwilioTalk extends IIntegrationTwilio {
