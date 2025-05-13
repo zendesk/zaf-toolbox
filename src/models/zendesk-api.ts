@@ -61,62 +61,55 @@ export interface ILinesResults extends IZendeskResponse {
     count: number;
 }
 
-interface LineBase {
-  id: number;
-  nickname: string;
-  priority: number;
-  default_group_id: number | null;
-  line_type: string;
-  transcription: boolean;
-  recorded: boolean;
-  call_recording_consent: string;
-  group_ids: number[];
-  greeting_ids: string[];
-  default_greeting_ids: string[];
-  categorised_greetings_with_sub_settings: CategorisedGreetingsWithSubSettings;
-  schedule_id: number | null;
-  created_at: string;
+export interface LineBase {
+    id: number;
+    nickname: string;
+    priority: number;
+    default_group_id: number | null;
+    line_type: string;
+    transcription: boolean;
+    recorded: boolean;
+    call_recording_consent: string;
+    group_ids: number[];
+    greeting_ids: string[];
+    default_greeting_ids: string[];
+    categorised_greetings_with_sub_settings: Record<string, string | Record<string, string>>;
+    schedule_id: number | null;
+    created_at: string;
 }
 
 export interface DigitalLine extends LineBase {
-  line_type: "digital";
-  brand_id: number;
-  line_id: string;
-  outbound_number: string | null;
+    line_type: "digital";
+    brand_id: number;
+    line_id: string;
+    outbound_number: string | null;
 }
 
 export interface PhoneLine extends LineBase {
-  line_type: "phone";
-  country_code: string;
-  external: boolean;
-  number: string;
-  name: string;
-  display_number: string;
-  location: string;
-  toll_free: boolean;
-  categorised_greetings: CategorisedGreetings;
-  sms_group_id: number | null;
-  capabilities: Capabilities;
-  sms_enabled: boolean;
-  voice_enabled: boolean;
-  outbound_enabled: boolean;
-  ivr_id: number | null;
-  failover_number: string | null;
+    line_type: "phone";
+    country_code: string;
+    external: boolean;
+    // eslint-disable-next-line id-denylist
+    number: string;
+    name: string;
+    display_number: string;
+    location: string;
+    toll_free: boolean;
+    categorised_greetings: Record<string, string>;
+    sms_group_id: number | null;
+    capabilities: Capabilities;
+    sms_enabled: boolean;
+    voice_enabled: boolean;
+    outbound_enabled: boolean;
+    ivr_id: number | null;
+    failover_number: string | null;
 }
 
 interface Capabilities {
-  sms: boolean;
-  mms: boolean;
-  voice: boolean;
-  emergency_address: boolean;
-}
-
-interface CategorisedGreetings {
-  [key: string]: string;
-}
-
-interface CategorisedGreetingsWithSubSettings {
-  [key: string]: string | { [subKey: string]: string };
+    sms: boolean;
+    mms: boolean;
+    voice: boolean;
+    emergency_address: boolean;
 }
 
 export type Line = DigitalLine | PhoneLine;
