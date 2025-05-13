@@ -439,6 +439,43 @@ describe("ZendeskService", () => {
                     expect(result).toEqual(locales);
                 });
             });
+
+            describe("getVoiceLines", () => {
+                it("should call the API and return the voice lines", async () => {
+                    const lines = [{ name: "line1" }];
+                    requestMock.mockResolvedValueOnce({ lines });
+
+                    const result = await service.getVoiceLines();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/voice/lines`);
+                    expect(result).toEqual(lines);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const lines = [{ name: "line1" }];
+                    requestMock
+                        .mockResolvedValueOnce({ lines, next_page: "next_page" })
+                        .mockResolvedValueOnce({ lines: [] });
+
+                    const result = await service.getVoiceLines();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/channels/voice/lines`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(lines);
+                });
+
+                it("should only call the API one time with fetchAllLines set to false", async () => {
+                    const lines = [{ name: "line1" }];
+                    requestMock.mockResolvedValueOnce({ lines, next_page: "next_page" });
+
+                    const result = await service.getVoiceLines(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/voice/lines`);
+                    expect(result).toEqual(lines);
+                });
+            });
         });
     });
 });
