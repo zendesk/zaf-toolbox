@@ -432,7 +432,7 @@ export type IIntegration =
     | IIntegrationIos
     | IIntegrationMessageBirds
     | IIntegrationMessenger
-    | IIntegrationTwillio
+    | IIntegrationTwilio
     | IIntegrationTwitter
     | IIntegrationWeb
     | IIntegrationWhatsApp
@@ -548,8 +548,18 @@ export interface IIntegrationMessenger extends IIntegrationBase {
     pageName?: string;
 }
 
-export interface IIntegrationTwillio extends IIntegrationBase {
+export interface IIntegrationTwilio extends IIntegrationBase {
     type: UserChannelTypes.Twilio;
+    phoneNumber: string;
+    isTalk?: boolean;
+}
+
+export interface IIntegrationTwilioTalk extends IIntegrationTwilio {
+    sms: boolean;
+    mms: boolean;
+}
+
+export interface IIntegrationSuncoTwilio extends IIntegrationTwilio {
     /**
      * Twilio Account SID.
      */
@@ -558,7 +568,6 @@ export interface IIntegrationTwillio extends IIntegrationBase {
      * SID for specific phone number. One of messagingServiceSid or phoneNumberSid must be provided when creating a Twilio integration
      */
     phoneNumberSid: string;
-    phoneNumber: string;
     /**
      * SID for specific messaging service. One of messagingServiceSid or phoneNumberSid must be provided when creating a Twilio integration.
      */

@@ -6,6 +6,7 @@ import {
     Capabilities,
     IAuthor,
     IContent,
+    IIntegrationSuncoTwilio,
     IIntegrationWhatsApp,
     ISendNotificationPayload,
     IServiceConfig,
@@ -473,21 +474,19 @@ describe("SunshineConversationApiService", () => {
                 }
             };
 
+            const notification: IIntegrationSuncoTwilio = {
+                id: "id",
+                status: "status",
+                "type": UserChannelTypes.Twilio,
+                accountSid: "accountSid",
+                phoneNumberSid: "phoneNumberSid",
+                messagingServiceSid: "messagingServiceSid",
+                displayName: "Twilio",
+                phoneNumber: "+12345678900"
+            };
+
             // Sending twilio notification
-            await sunshineConversationApiService.sendNotification(
-                {
-                    id: "id",
-                    status: "status",
-                    "type": UserChannelTypes.Twilio,
-                    accountSid: "accountSid",
-                    phoneNumberSid: "phoneNumberSid",
-                    messagingServiceSid: "messagingServiceSid",
-                    displayName: "Twilio",
-                    phoneNumber: "+12345678900"
-                },
-                phoneNumberSample,
-                contentSample
-            );
+            await sunshineConversationApiService.sendNotification(notification, phoneNumberSample, contentSample);
 
             expect(client.request).toHaveBeenCalledWith(options);
         });

@@ -18,7 +18,10 @@ import {
     IZendeskTag,
     IZendeskLocale,
     IZendeskGroup,
-    IZendeskOrganizations
+    IZendeskOrganizations,
+    ILinesResults,
+    IZendeskResponse,
+    LineBase
 } from "@models/index";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -40,16 +43,15 @@ export class ZendeskApiService {
      * @param extractArrayFn Function to extract the array of items from the response.
      * @returns A promise resolving to a flattened array of all items.
      */
-    private async fetchAllPaginatedResults<TResponse, TItem>(
+    private async fetchAllPaginatedResults<TResponse extends IZendeskResponse, TItem>(
         url: string,
         fetchAll: boolean,
         extractArrayFn: (response: TResponse) => TItem[]
     ): Promise<TItem[]> {
         const results: TResponse[] = [await this.client.request<string, TResponse>(url)];
-
         if (fetchAll) {
             while (true) {
-                const nextPage = (results[results.length - 1] as TResponse & { next_page?: string }).next_page;
+                const nextPage = results[results.length - 1].next_page;
                 if (!nextPage) break;
                 results.push(await this.client.request<string, TResponse>(nextPage));
             }
@@ -252,5 +254,16 @@ export class ZendeskApiService {
         const results = await this.client.request<string, ILocalesResults>(`/api/v2/locales`);
 
         return results.locales;
+    }
+
+    /**
+     * Fetch all voice lines
+     */
+    public async getVoiceLines(fetchAllLines = true): Promise<LineBase[]> {
+        return this.fetchAllPaginatedResults<ILinesResults, LineBase>(
+            `/api/v2/channels/voice/lines`,
+            fetchAllLines,
+            (response) => response.lines
+        );
     }
 }
