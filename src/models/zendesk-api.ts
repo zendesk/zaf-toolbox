@@ -56,9 +56,6 @@ export interface IOrganizationsResults extends IZendeskResponse {
 
 export interface ILinesResults extends IZendeskResponse {
     lines: Line[];
-    next_page: string | null;
-    previous_page: string | null;
-    count: number;
 }
 
 export interface LineBase {
