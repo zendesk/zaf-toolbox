@@ -58,12 +58,17 @@ export interface ILinesResults extends IZendeskResponse {
     lines: Line[];
 }
 
-export interface LineBase {
+enum LineType {
+    Digital = "digital",
+    Phone = "phone"
+}
+
+interface LineBase {
     id: number;
     nickname: string;
     priority: number;
     default_group_id: number | null;
-    line_type: string;
+    line_type: LineType;
     transcription: boolean;
     recorded: boolean;
     call_recording_consent: string;
@@ -76,14 +81,14 @@ export interface LineBase {
 }
 
 export interface DigitalLine extends LineBase {
-    line_type: "digital";
+    line_type: LineType.Digital;
     brand_id: number;
     line_id: string;
     outbound_number: string | null;
 }
 
 export interface PhoneLine extends LineBase {
-    line_type: "phone";
+    line_type: LineType.Phone;
     country_code: string;
     external: boolean;
     // eslint-disable-next-line id-denylist
