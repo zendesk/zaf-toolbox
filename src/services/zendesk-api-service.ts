@@ -21,7 +21,7 @@ import {
     IZendeskOrganizations,
     ILinesResults,
     IZendeskResponse,
-    LineBase
+    Line
 } from "@models/index";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -259,8 +259,8 @@ export class ZendeskApiService {
     /**
      * Fetch all voice lines
      */
-    public async getVoiceLines(fetchAllLines = true): Promise<LineBase[]> {
-        return this.fetchAllPaginatedResults<ILinesResults, LineBase>(
+    public async getVoiceLines(fetchAllLines = true): Promise<Line[]> {
+        return this.fetchAllPaginatedResults<ILinesResults, Line>(
             `/api/v2/channels/voice/lines`,
             fetchAllLines,
             (response) => response.lines

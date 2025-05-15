@@ -58,12 +58,12 @@ export interface ILinesResults extends IZendeskResponse {
     lines: Line[];
 }
 
-export interface LineBase {
+interface LineBase {
     id: number;
     nickname: string;
     priority: number;
     default_group_id: number | null;
-    line_type: string;
+    line_type: "phone" | "digital";
     transcription: boolean;
     recorded: boolean;
     call_recording_consent: string;
