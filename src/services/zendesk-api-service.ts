@@ -21,7 +21,9 @@ import {
     IZendeskOrganizations,
     ILinesResults,
     IZendeskResponse,
-    Line
+    Line,
+    IMessage,
+    IMessagesResults
 } from "@models/index";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -264,6 +266,17 @@ export class ZendeskApiService {
             `/api/v2/channels/voice/lines`,
             fetchAllLines,
             (response) => response.lines
+        );
+    }
+
+    /**
+     * Fetch message history
+     */
+    public async getMessageHistory(fetchAllMessages = true): Promise<IMessage[]> {
+        return this.fetchAllPaginatedResults<IMessagesResults, IMessage>(
+            `/api/v2/channels/sms/message_history.json`,
+            fetchAllMessages,
+            (response) => response.messages
         );
     }
 }

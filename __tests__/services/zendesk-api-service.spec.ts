@@ -476,6 +476,43 @@ describe("ZendeskService", () => {
                     expect(result).toEqual(lines);
                 });
             });
+
+            describe("getMessageHistory", () => {
+                it("should call the API and return the message history", async () => {
+                    const messages = [{ id: 1 }];
+                    requestMock.mockResolvedValueOnce({ messages });
+
+                    const result = await service.getMessageHistory();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/sms/message_history.json`);
+                    expect(result).toEqual(messages);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const messages = [{ id: 1 }];
+                    requestMock
+                        .mockResolvedValueOnce({ messages, next_page: "next_page" })
+                        .mockResolvedValueOnce({ messages: [] });
+
+                    const result = await service.getMessageHistory();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/channels/sms/message_history.json`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(messages);
+                });
+
+                it("should only call the API one time with fetchAllMessages set to false", async () => {
+                    const messages = [{ id: 1 }];
+                    requestMock.mockResolvedValueOnce({ messages, next_page: "next_page" });
+
+                    const result = await service.getMessageHistory(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/sms/message_history.json`);
+                    expect(result).toEqual(messages);
+                });
+            });
         });
     });
 });
