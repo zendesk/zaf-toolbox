@@ -111,6 +111,25 @@ interface Capabilities {
 
 export type Line = DigitalLine | PhoneLine;
 
+export interface IMessage {
+    id: number;
+    from: string;
+    to: string;
+    direction: "inbound" | "outbound";
+    status: string;
+    agent_id: number | null;
+    customer_id: number;
+    ticket_id: number | null;
+    price: number;
+    created_at: string;
+    updated_at: string;
+    localized_created_at: string;
+}
+
+export interface IMessagesResults extends IZendeskResponse {
+    messages: IMessage[];
+}
+
 export interface ILocalesResults {
     locales: IZendeskLocale[];
 }
