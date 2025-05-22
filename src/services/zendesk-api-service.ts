@@ -269,6 +269,9 @@ export class ZendeskApiService {
         );
     }
 
+    /**
+     * Fetch message history
+     */
     public async getMessageHistory(fetchAllMessages = true): Promise<IMessage[]> {
         return this.fetchAllPaginatedResults<IMessagesResults, IMessage>(
             `/api/v2/channels/sms/message_history.json`,
