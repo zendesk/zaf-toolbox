@@ -432,7 +432,8 @@ export type IIntegration =
     | IIntegrationIos
     | IIntegrationMessageBirds
     | IIntegrationMessenger
-    | IIntegrationTwilio
+    | IIntegrationTwilioTalk
+    | IIntegrationSuncoTwilio
     | IIntegrationTwitter
     | IIntegrationWeb
     | IIntegrationWhatsApp
@@ -551,15 +552,26 @@ export interface IIntegrationMessenger extends IIntegrationBase {
 export interface IIntegrationTwilio extends IIntegrationBase {
     type: UserChannelTypes.Twilio;
     phoneNumber: string;
-    isTalk?: boolean;
+    /**
+     * Extra boolean to check if it's Talk or Sunco
+     */
+    isTalk: boolean;
 }
 
 export interface IIntegrationTwilioTalk extends IIntegrationTwilio {
+    /**
+     * Talk Twilio integration as true
+     */
+    isTalk: true;
     sms: boolean;
     mms: boolean;
 }
 
 export interface IIntegrationSuncoTwilio extends IIntegrationTwilio {
+    /**
+     * Talk Twilio integration as false
+     */
+    isTalk: false;
     /**
      * Twilio Account SID.
      */
