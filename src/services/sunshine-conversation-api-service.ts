@@ -16,7 +16,8 @@ import {
     ISunshineConversationGetIntegrationsFilters,
     IMetadata,
     IMessageTemplate,
-    ISendNotification
+    ISendNotification,
+    ICreateSuncoWebhookResponse
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
@@ -240,5 +241,27 @@ export class SunshineConversationApiService {
         );
 
         return responseJSON.notification._id;
+    }
+
+    /**
+     * Create a webhook for the application
+     *
+     * @param target - The target URL for the webhook
+     * @param triggers - The triggers for the webhook
+     * @param includeClient - Whether to include client information in the webhook
+     * @returns The response from the webhook creation
+     */
+    public async createWebhook(
+        target: string,
+        triggers: string[],
+        includeClient: boolean
+    ): Promise<ICreateSuncoWebhookResponse> {
+        return await this.client.request<unknown, ICreateSuncoWebhookResponse>(
+            this.createV1Options(`/apps/${this.settings.appId}/webhooks`, HttpMethod.POST, {
+                target,
+                triggers,
+                includeClient
+            })
+        );
     }
 }

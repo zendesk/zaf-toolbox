@@ -524,4 +524,29 @@ describe("SunshineConversationApiService", () => {
             expect(client.request).toHaveBeenCalledWith(options);
         });
     });
+
+    describe("createWebhook", () => {
+        it("should call the API to create a webhook", async () => {
+            const options = {
+                url: `https://api.smooch.io/v1.1/apps/suncoAppId/webhooks`,
+                type: HttpMethod.POST,
+                contentType: "application/json",
+                data: JSON.stringify({
+                    target: "target",
+                    triggers: ["event1", "event2"],
+                    includeClient: true
+                }),
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                httpCompleteResponse: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            await sunshineConversationApiService.createWebhook("target", ["event1", "event2"], true);
+
+            expect(client.request).toHaveBeenCalledWith(options);
+        });
+    });
 });
