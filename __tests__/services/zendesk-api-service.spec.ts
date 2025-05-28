@@ -552,4 +552,46 @@ describe("ZendeskService", () => {
             });
         });
     });
+
+    describe("ZisIntegration", () => {
+        const zisIntegration = {
+            name: "Test Integration",
+            description: "Test Description",
+            jwt_public_key: "public_key",
+            zendesk_oauth_client: {
+                id: 1,
+                secret: "secret",
+                identifier: "identifier"
+            }
+        };
+
+        it("should return the Zis integration", async () => {
+            requestMock.mockResolvedValueOnce({ integrations: [zisIntegration] });
+
+            const result = await service.fetchZisIntegrations();
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `api/services/zis/registry/integrations`,
+                method: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toEqual([zisIntegration]);
+        });
+
+        it("should create a new Zis integration", async () => {
+            requestMock.mockResolvedValueOnce(zisIntegration);
+
+            const result = await service.createZisIntegration(zisIntegration.name, zisIntegration.description);
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/services/zis/registry/${zisIntegration.name}`,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    description: zisIntegration.description
+                })
+            });
+            expect(result).toEqual(zisIntegration);
+        });
+    });
 });
