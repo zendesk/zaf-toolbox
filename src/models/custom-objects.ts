@@ -110,7 +110,7 @@ export enum ListCutomObjectRecordsSortingOptions {
     MINUS_UPDATED_AT = "-updated_at"
 }
 
-export interface IListCustomObjectRecordsFilter {
+export interface IListFilter {
     filter?: {
         /**
          * Comma separated list of external ids of records
@@ -141,7 +141,7 @@ export interface IListCustomObjectRecordsFilter {
     sort?: ListCutomObjectRecordsSortingOptions;
 }
 
-export interface ISearchCustomObjectRecordsFilter extends IListCustomObjectRecordsFilter {
+export interface ISearchCustomObjectRecordsFilter extends IListFilter {
     query: string;
 }
 

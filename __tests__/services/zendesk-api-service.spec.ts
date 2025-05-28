@@ -594,4 +594,107 @@ describe("ZendeskService", () => {
             expect(result).toEqual(zisIntegration);
         });
     });
+
+    describe("jobSpecs", () => {
+        const jobSpec = {
+            description: "Test Job",
+            event_source: "source",
+            event_type: "type",
+            flow_name: "flow",
+            installed: true,
+            integration: "integration",
+            name: "jobName",
+            uuid: "uuid"
+        };
+
+        it("should fetchs jobs and call Zendesk API multiple times if has more is true", async () => {
+            requestMock
+                .mockResolvedValueOnce({
+                    job_specs: [jobSpec],
+                    meta: {
+                        has_more: true,
+                        after: "1"
+                    }
+                })
+                .mockResolvedValueOnce({
+                    job_specs: [jobSpec],
+                    meta: {
+                        has_more: false
+                    }
+                });
+
+            const data = await service.fetchZisJobSpecs("integrationName");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/registry/integrationName/job_specs",
+                type: "GET",
+                data: {
+                    page: {
+                        size: "100"
+                    }
+                }
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: "/api/services/zis/registry/integrationName/job_specs",
+                type: "GET",
+                data: {
+                    page: {
+                        after: "1",
+                        size: "100"
+                    }
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(2);
+            expect(data).toHaveLength(2);
+        });
+
+        it("should fetchs jobs with correct data", async () => {
+            requestMock.mockResolvedValueOnce({
+                job_specs: [jobSpec],
+                meta: {
+                    has_more: false
+                }
+            });
+
+            const data = await service.fetchZisJobSpecs("integrationName", {
+                page: {
+                    size: "5"
+                }
+            });
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/registry/integrationName/job_specs",
+                type: "GET",
+                data: {
+                    page: {
+                        size: "5"
+                    }
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+            expect(data).toHaveLength(1);
+        });
+
+        it("should create a job spec with correct data", async () => {
+            await service.createZisJobSpec("job_name_test");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/registry/job_specs/install?job_spec_name=job_name_test",
+                type: "POST",
+                contentType: "application/json"
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("should delete a job spec with correct data", async () => {
+            await service.deleteZisJobSpec("job_name_test");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/registry/job_specs/install?job_spec_name=job_name_test",
+                type: "DELETE",
+                contentType: "application/json"
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });

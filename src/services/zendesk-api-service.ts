@@ -25,9 +25,15 @@ import {
     IZendeskResponse,
     Line,
     IMessage,
-    IMessagesResults
+    IMessagesResults,
+    IListFilter
 } from "@models/index";
-import { IZisIntegration, IZisIntegrationResponse } from "@models/zendesk-integration-services";
+import {
+    IZisIntegration,
+    IZisIntegrationResponse,
+    IZisJobspec,
+    IZisJobspecsResponse
+} from "@models/zendesk-integration-services";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
@@ -323,6 +329,73 @@ export class ZendeskApiService {
             data: JSON.stringify({
                 description
             })
+        });
+    }
+
+    /**
+     * Fetch Zis job specs from an integration
+     *
+     * @param {string} integrationName Name of the Zis integration
+     * @returns {Promise<unknown>} List of Zis job specs
+     */
+    public async fetchZisJobSpecs(integrationName: string, filterTheList?: IListFilter): Promise<IZisJobspec[]> {
+        let hasMore = true;
+        const numberOfJobSpecs = "100"; // Maximum number of job specs per page
+        let jobspecs: IZisJobspec[] = [];
+        let data: IListFilter = filterTheList ?? {
+            page: {
+                size: numberOfJobSpecs
+            }
+        };
+
+        do {
+            const response = await this.client.request<unknown, IZisJobspecsResponse>({
+                url: `/api/services/zis/registry/${integrationName}/job_specs`,
+                type: "GET",
+                data
+            });
+
+            jobspecs = [...jobspecs, ...response.job_specs];
+
+            hasMore = response.meta.has_more;
+            if (hasMore) {
+                data = {
+                    page: {
+                        after: response.meta.after,
+                        size: numberOfJobSpecs
+                    }
+                };
+            }
+        } while (hasMore);
+
+        return jobspecs;
+    }
+
+    /**
+     * Install a Zis job spec for an integration
+     *
+     * @param {string} jobSpecName Name of the Zis job spec to install
+     * @returns {Promise<void>} Resolves when the job spec is installed
+     */
+    public async createZisJobSpec(jobSpecName: string): Promise<void> {
+        return await this.client.request({
+            url: `/api/services/zis/registry/job_specs/install?job_spec_name=${encodeURIComponent(jobSpecName)}`,
+            contentType: "application/json",
+            type: "POST"
+        });
+    }
+
+    /**
+     * Delete a Zis job spec for an integration
+     *
+     * @param {string} jobSpecName Name of the Zis job spec to delete
+     * @returns {Promise<void>} Resolves when the job spec is deleted
+     */
+    public async deleteZisJobSpec(jobSpecName: string): Promise<void> {
+        return await this.client.request({
+            url: `/api/services/zis/registry/job_specs/install?job_spec_name=${encodeURIComponent(jobSpecName)}`,
+            contentType: "application/json",
+            type: "DELETE"
         });
     }
 }

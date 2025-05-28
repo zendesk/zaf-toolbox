@@ -14,3 +14,22 @@ export interface IZisIntegration {
 export interface IZisIntegrationResponse {
     integrations: IZisIntegration[];
 }
+
+export interface IZisJobspec {
+    description: string;
+    event_source: string;
+    event_type: string;
+    flow_name: string;
+    installed: boolean;
+    integration: string;
+    name: string;
+    uuid: string;
+}
+export interface IZisJobspecsResponse {
+    job_specs: IZisJobspec[];
+    meta: {
+        after: string;
+        before: string;
+        has_more: boolean;
+    };
+}
