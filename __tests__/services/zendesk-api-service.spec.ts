@@ -697,4 +697,64 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("createAccessToken", () => {
+        it("should create an access token with the correct data", async () => {
+            await service.createZendeskAccessToken(102, ["read", "write"]);
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/v2/oauth/tokens.json",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    token: {
+                        client_id: 102,
+                        scopes: ["read", "write"]
+                    }
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("createZisConnection", () => {
+        it("should create an access token with the correct data", async () => {
+            await service.createZisConnection("integrationName", "token", "connectionName", "zendesk.com");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/integrations/integrationName/connections/bearer_token",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    Authorization: "Bearer token"
+                },
+                data: JSON.stringify({
+                    name: "connectionName",
+                    token: "token",
+                    allowed_domain: "zendesk.com"
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("createZisInboundWebhook", () => {
+        it("should create an access token with the correct data", async () => {
+            await service.createZisInboundWebhook("integrationName", "token", "source", "eventType");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/inbound_webhooks/generic/integrationName",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    Authorization: "Bearer token"
+                },
+                data: JSON.stringify({
+                    source_system: "source",
+                    event_type: "eventType"
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
