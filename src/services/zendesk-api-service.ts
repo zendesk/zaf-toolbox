@@ -19,6 +19,8 @@ import {
     IZendeskLocale,
     IZendeskGroup,
     IZendeskOrganizations,
+    IZendeskRoles,
+    IRolesResults,
     ILinesResults,
     IZendeskResponse,
     Line,
@@ -247,6 +249,16 @@ export class ZendeskApiService {
             `/api/v2/organizations`,
             fetchAllOrganizations,
             (response) => response.organizations
+        );
+    }
+    /**
+     * Fetch all user instance roles
+     */
+    public async getRoles(fetchAllRoles = true): Promise<IZendeskRoles[]> {
+        return this.fetchAllPaginatedResults<IRolesResults, IZendeskRoles>(
+            `/api/v2/custom_roles`,
+            fetchAllRoles,
+            (response) => response.custom_roles
         );
     }
     /**

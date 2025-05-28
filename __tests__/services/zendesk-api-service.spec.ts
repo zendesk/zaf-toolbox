@@ -428,6 +428,43 @@ describe("ZendeskService", () => {
                     expect(result).toEqual(organizations);
                 });
             });
+
+            describe("getRoles", () => {
+                it("should call the API and return the roles", async () => {
+                    const custom_roles = [{ name: "role1" }];
+                    requestMock.mockResolvedValueOnce({ custom_roles });
+
+                    const result = await service.getRoles();
+
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/custom_roles`);
+                    expect(result).toEqual(custom_roles);
+                });
+
+                it("should continue calling the API until next_page disappears", async () => {
+                    const custom_roles = [{ name: "role1" }];
+                    requestMock
+                        .mockResolvedValueOnce({ custom_roles, next_page: "next_page" })
+                        .mockResolvedValueOnce({ custom_roles: [] });
+
+                    const result = await service.getRoles();
+
+                    expect(requestMock).toHaveBeenCalledTimes(2);
+                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/custom_roles`);
+                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(result).toEqual(custom_roles);
+                });
+
+                it("should only call the API one time with fetchAllRoles set to false", async () => {
+                    const custom_roles = [{ name: "role1" }];
+                    requestMock.mockResolvedValueOnce({ custom_roles, next_page: "next_page" });
+
+                    const result = await service.getRoles(false);
+
+                    expect(requestMock).toHaveBeenCalledTimes(1);
+                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/custom_roles`);
+                    expect(result).toEqual(custom_roles);
+                });
+            });
             describe("getLocales", () => {
                 it("should fetch and return locales", async () => {
                     const locales = [{ locale: "en-US" }];
