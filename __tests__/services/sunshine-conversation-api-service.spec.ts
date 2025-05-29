@@ -478,6 +478,7 @@ describe("SunshineConversationApiService", () => {
                 id: "id",
                 status: "status",
                 "type": UserChannelTypes.Twilio,
+                isTalk: false,
                 accountSid: "accountSid",
                 phoneNumberSid: "phoneNumberSid",
                 messagingServiceSid: "messagingServiceSid",

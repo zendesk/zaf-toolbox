@@ -143,7 +143,7 @@ jobs:
             pull-requests: write
         steps:
             - name: Failure -> Request changes
-              if: ${{ needs.build.result == 'failure' || needs.lint.result == 'failure' }}
+              if: ${{ needs.build.result == 'failure' || needs.test.result == 'failure' || needs.lint.result == 'failure' }}
               env:
                   MSG_FILE: "msg.txt"
                   JOBS_REQUEST_FILE: "jobs_rq.json"

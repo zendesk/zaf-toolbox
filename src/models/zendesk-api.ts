@@ -33,6 +33,16 @@ export interface IZendeskOrganizations {
     url: string;
 }
 
+export interface IZendeskRoles {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+    description: string;
+    role_type: number;
+    team_member_count: number;
+}
+
 export interface IZendeskLocale {
     id: number;
     name: string;
@@ -52,6 +62,14 @@ export interface IGroupsResults extends IZendeskResponse {
 
 export interface IOrganizationsResults extends IZendeskResponse {
     organizations: IZendeskOrganizations[];
+}
+
+export interface IRolesResults extends IZendeskResponse {
+    custom_roles: IZendeskRoles[];
+}
+
+export interface ILocalesResults {
+    locales: IZendeskLocale[];
 }
 
 export interface ILinesResults extends IZendeskResponse {
@@ -134,8 +152,4 @@ export interface IMessage {
 
 export interface IMessagesResults extends IZendeskResponse {
     messages: IMessage[];
-}
-
-export interface ILocalesResults {
-    locales: IZendeskLocale[];
 }
