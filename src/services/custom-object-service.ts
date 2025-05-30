@@ -7,7 +7,7 @@ import {
     IGetCustomObjectRecordsResponse,
     IListCustomObjectsResponse,
     ICreateCustomObjectRecordBody,
-    IListCustomObjectRecordsFilter,
+    IListFilter,
     IListCustomObjectRecordsResponse,
     ICustomObjectRecord,
     ListCutomObjectRecordsSortingOptions,
@@ -124,7 +124,7 @@ export class CustomObjectService {
      */
     public async listCustomObjectRecords<T extends ICustomObjectRecordField>(
         key: string,
-        data?: IListCustomObjectRecordsFilter
+        data?: IListFilter
     ): Promise<ICustomObjectRecord<T>[]> {
         const { custom_object_records } = await this.client.request<any, IListCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records`,
@@ -145,7 +145,7 @@ export class CustomObjectService {
     ): Promise<ICustomObjectRecord<T>[]> {
         return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records`, {
             sort: sortOptions?.sort
-        } as IListCustomObjectRecordsFilter);
+        } as IListFilter);
     }
 
     /**
@@ -263,7 +263,7 @@ export class CustomObjectService {
      */
     private async fetchAllPaginatedRecords<T extends ICustomObjectRecordField>(
         url: string,
-        initialData: IListCustomObjectRecordsFilter
+        initialData: IListFilter
     ): Promise<ICustomObjectRecord<T>[]> {
         let hasMore = true;
         let data = initialData;
@@ -290,7 +290,7 @@ export class CustomObjectService {
                               sort: initialData.sort
                           }
                         : undefined)
-                } as IListCustomObjectRecordsFilter;
+                } as IListFilter;
             }
         } while (hasMore);
 
