@@ -33,3 +33,27 @@ export interface IZisJobspecsResponse {
         has_more: boolean;
     };
 }
+
+export interface IBearerTokenResponse {
+    name: string;
+    token: string;
+    allowed_domain: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ICreateConnectionResponse {
+    bearer_token: IBearerTokenResponse;
+}
+
+export interface ICreateInboundWebhookResponse {
+    id: string;
+    uuid: string;
+    zendesk_account_id: number;
+    path: string;
+    integration: string;
+    source_system: string;
+    event_type: string;
+    username: string;
+    password: string;
+}

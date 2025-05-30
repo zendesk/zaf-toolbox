@@ -26,9 +26,12 @@ import {
     Line,
     IMessage,
     IMessagesResults,
-    IListFilter
+    IListFilter,
+    ICreateAccessTokenResponse
 } from "@models/index";
 import {
+    ICreateConnectionResponse,
+    ICreateInboundWebhookResponse,
     IZisIntegration,
     IZisIntegrationResponse,
     IZisJobspec,
@@ -396,6 +399,86 @@ export class ZendeskApiService {
             url: `/api/services/zis/registry/job_specs/install?job_spec_name=${encodeURIComponent(jobSpecName)}`,
             contentType: "application/json",
             type: "DELETE"
+        });
+    }
+
+    /**
+     * Creates an access token for the integration.
+     *
+     * @param {number} clientId - The client ID of the integration.
+     * @param {string[]} scopes - The scopes for the access token, e.g., ["read", "write"]. More information: https://developer.zendesk.com/api-reference/ticketing/oauth/oauth_tokens/#scopes
+     * @returns {Promise<ICreateAccessTokenResponse>} - The response from the API.
+     */
+    public async createZendeskAccessToken(client_id: number, scopes: string[]): Promise<ICreateAccessTokenResponse> {
+        return await this.client.request({
+            url: "/api/v2/oauth/tokens.json",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                token: {
+                    client_id,
+                    scopes
+                }
+            })
+        });
+    }
+
+    /**
+     * Creates a ZIS connection for the given integration.
+     *
+     * @param {string} integration_name - The name of the ZIS integration.
+     * @param {string} token - The token for the connection.
+     * @param {string} connection_name - The name of the connection.
+     * @param {string} allowed_domain - The allowed domain for the connection.
+     * @returns {Promise<ICreateConnectionResponse>} - The response from the API.
+     */
+    public async createZisConnection(
+        integration_name: string,
+        token: string,
+        connection_name: string,
+        allowed_domain: string
+    ): Promise<ICreateConnectionResponse> {
+        return await this.client.request({
+            url: `/api/services/zis/integrations/${integration_name}/connections/bearer_token`,
+            type: "POST",
+            contentType: "application/json",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            data: JSON.stringify({
+                name: connection_name,
+                token,
+                allowed_domain
+            })
+        });
+    }
+
+    /**
+     * Creates a ZIS inbound webhook for the given integration.
+     *
+     * @param {string} integration_name - The name of the ZIS integration.
+     * @param {string} token - The token for the webhook.
+     * @param {string} source_system - The source system for the webhook.
+     * @param {string} event_type - The event type for the webhook.
+     * @returns {Promise<ICreateInboundWebhookResponse>} - The response from the API.
+     */
+    public async createZisInboundWebhook(
+        integration_name: string,
+        token: string,
+        source_system: string,
+        event_type: string
+    ): Promise<ICreateInboundWebhookResponse> {
+        return await this.client.request({
+            url: `/api/services/zis/inbound_webhooks/generic/${integration_name}`,
+            type: "POST",
+            contentType: "application/json",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            data: JSON.stringify({
+                source_system,
+                event_type
+            })
         });
     }
 }

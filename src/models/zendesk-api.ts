@@ -153,3 +153,22 @@ export interface IMessage {
 export interface IMessagesResults extends IZendeskResponse {
     messages: IMessage[];
 }
+
+export interface ICreateAccessTokenResponseToken {
+    url: string;
+    id: number;
+    user_id: number;
+    client_id: number;
+    token: string;
+    refresh_token: string | null;
+    created_at: string;
+    expires_at: string | null;
+    used_at: string | null;
+    scopes: string[];
+    refresh_token_expires_at: string | null;
+    full_token: string;
+}
+
+export interface ICreateAccessTokenResponse {
+    token: ICreateAccessTokenResponseToken;
+}
