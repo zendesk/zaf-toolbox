@@ -1,7 +1,9 @@
 import {
     ICreateCustomObjectRecordBody,
     CustomObjectFieldType,
-    ListCutomObjectRecordsSortingOptions
+    ListCutomObjectRecordsSortingOptions,
+    RecordBulkAction,
+    IBulkJobBodyCreate
 } from "@models/custom-objects";
 import { CustomObjectService } from "@services/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
@@ -386,6 +388,60 @@ describe("CustomObjectService", () => {
                 }
             });
             expect(requestMock).toHaveBeenCalledTimes(2);
+        });
+
+        it("should call Zendesk API for bulk jobs correctly", async () => {
+            requestMock.mockResolvedValueOnce({
+                "job_status": {
+                    "id": "V3-291e720c98aef4d953563ab090486213",
+                    "message": null,
+                    "progress": null,
+                    "results": null,
+                    "status": "queued",
+                    "total": 2,
+                    "url": "https://test.zendesk.com/api/v2/job_statuses/V3-291e720c98aef4d953563ab090486213.json"
+                }
+            });
+
+            const body: IBulkJobBodyCreate = {
+                "job": {
+                    "action": RecordBulkAction.create,
+                    "items": [
+                        {
+                            "custom_object_fields": {
+                                "color": "Red",
+                                "year": "2020"
+                            },
+                            "name": "2020 Tesla"
+                        },
+                        {
+                            "custom_object_fields": {
+                                "color": "Blue",
+                                "external_id": "ddd444",
+                                "year": "2012"
+                            },
+                            "name": "2012 Toyota"
+                        },
+                        {
+                            "custom_object_fields": {
+                                "color": "Silver",
+                                "external_id": "ddd445",
+                                "year": "2017"
+                            },
+                            "name": "2017 Ford"
+                        }
+                    ]
+                }
+            };
+            await service.bulkJobsForRecords("foo", body);
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/custom_objects/foo/jobs`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(body)
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
 });
