@@ -129,12 +129,18 @@ interface Capabilities {
 
 export type Line = DigitalLine | PhoneLine;
 
+export enum MessageStatus {
+    RECEIVED = "received",
+    UNDELIVERED = "undelivered",
+    FAILED = "failed"
+}
+
 export interface IMessage {
     id: number;
     from: string;
     to: string;
     direction: "inbound" | "outbound";
-    status: string;
+    status: MessageStatus;
     agent_id: number | null;
     customer_id: number;
     ticket_id: number | null;

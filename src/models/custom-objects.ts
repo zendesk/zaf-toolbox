@@ -147,6 +147,20 @@ export interface ISearchCustomObjectRecordsFilter extends IListFilter {
 
 export interface ICreateCustomObjectRecordBody<T extends ICustomObjectRecordField> {
     custom_object_fields: T;
+    external_id?: string;
+    name: string;
+}
+
+export interface IUpdateCustomObjectRecordBody<T extends ICustomObjectRecordField> {
+    custom_object_fields: T;
+    external_id?: string;
+    name: string;
+    id: string;
+}
+
+export interface ICreateCustomObjectRecordBodyWithExternalId<T extends ICustomObjectRecordField> {
+    custom_object_fields: T;
+    external_id: string;
     name: string;
 }
 
@@ -183,4 +197,84 @@ export interface IListCustomObjectRecordsResponse<T extends ICustomObjectRecordF
 
 export interface IGetCustomObjectRecordsResponse<T extends ICustomObjectRecordField> {
     custom_object_record: ICustomObjectRecord<T>;
+}
+
+export enum RecordBulkAction {
+    create = "create",
+    delete = "delete",
+    delete_by_external_id = "delete_by_external_id",
+    create_or_update_by_external_id = "create_or_update_by_external_id",
+    create_or_update_by_name = "create_or_update_by_name",
+    update = "update"
+}
+
+interface IBulkJobBodyBase<T> {
+    job: {
+        action: RecordBulkAction;
+        items: T[];
+    };
+}
+
+export interface IBulkJobBodyCreate extends IBulkJobBodyBase<ICreateCustomObjectRecordBody<ICustomObjectRecordField>> {
+    job: {
+        action: RecordBulkAction.create;
+        items: ICreateCustomObjectRecordBody<ICustomObjectRecordField>[];
+    };
+}
+
+export interface IBulkJobBodyUpdate extends IBulkJobBodyBase<IUpdateCustomObjectRecordBody<ICustomObjectRecordField>> {
+    job: {
+        action: RecordBulkAction.update;
+        items: IUpdateCustomObjectRecordBody<ICustomObjectRecordField>[];
+    };
+}
+
+export interface IBulkJobBodyCreateOrUpdateByName
+    extends IBulkJobBodyBase<ICreateCustomObjectRecordBody<ICustomObjectRecordField>> {
+    job: {
+        action: RecordBulkAction.create_or_update_by_name;
+        items: ICreateCustomObjectRecordBody<ICustomObjectRecordField>[];
+    };
+}
+
+export interface IBulkJobBodyCreateOrUpdateByExternalId
+    extends IBulkJobBodyBase<ICreateCustomObjectRecordBodyWithExternalId<ICustomObjectRecordField>> {
+    job: {
+        action: RecordBulkAction.create_or_update_by_external_id;
+        items: ICreateCustomObjectRecordBodyWithExternalId<ICustomObjectRecordField>[];
+    };
+}
+
+export interface IBulkJobBodyDelete extends IBulkJobBodyBase<string> {
+    job: {
+        action: RecordBulkAction.delete;
+        items: string[];
+    };
+}
+
+export interface IBulkJobBodyDeleteByExternalId extends IBulkJobBodyBase<string> {
+    job: {
+        action: RecordBulkAction.delete_by_external_id;
+        items: string[];
+    };
+}
+
+export type IBulkJobBody =
+    | IBulkJobBodyCreate
+    | IBulkJobBodyUpdate
+    | IBulkJobBodyCreateOrUpdateByName
+    | IBulkJobBodyCreateOrUpdateByExternalId
+    | IBulkJobBodyDelete
+    | IBulkJobBodyDeleteByExternalId;
+
+export interface IBulkJobResponse {
+    "job_status": {
+        "id": string;
+        "message": string;
+        "progress": string;
+        "results": unknown;
+        "status": string;
+        "total": number;
+        "url": string;
+    };
 }
