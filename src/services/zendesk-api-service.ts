@@ -306,7 +306,7 @@ export class ZendeskApiService {
      */
     public async fetchZisIntegrations(): Promise<IZisIntegration[]> {
         const { integrations } = await this.client.request<unknown, IZisIntegrationResponse>({
-            url: `api/services/zis/registry/integrations`,
+            url: `/api/services/zis/registry/integrations`,
             method: "GET",
             contentType: "application/json"
         });
