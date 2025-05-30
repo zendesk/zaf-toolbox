@@ -27,6 +27,7 @@ import {
     IMessage,
     IMessagesResults
 } from "@models/index";
+import { IZisIntegration, IZisIntegrationResponse } from "@models/zendesk-integration-services";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
@@ -290,5 +291,38 @@ export class ZendeskApiService {
             fetchAllMessages,
             (response) => response.messages
         );
+    }
+
+    /**
+     * Fetch Zis integrations
+     *
+     * @returns {Promise<IZisIntegration[]>} List of Zis integrations
+     */
+    public async fetchZisIntegrations(): Promise<IZisIntegration[]> {
+        const { integrations } = await this.client.request<unknown, IZisIntegrationResponse>({
+            url: `/api/services/zis/registry/integrations`,
+            method: "GET",
+            contentType: "application/json"
+        });
+
+        return integrations;
+    }
+
+    /**
+     * Create Zis Integrations
+     *
+     * @param {string} name Name of the Zis integration
+     * @param {string} description Description of the Zis integration
+     * @returns {Promise<IZisIntegration>} List of Zis integrations
+     */
+    public async createZisIntegration(name: string, description: string): Promise<IZisIntegration> {
+        return await this.client.request<unknown, IZisIntegration>({
+            url: `/api/services/zis/registry/${name}`,
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                description
+            })
+        });
     }
 }
