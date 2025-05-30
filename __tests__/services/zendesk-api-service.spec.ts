@@ -757,4 +757,20 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("uploadZisBundle", () => {
+        it("should upload a Zis bundle with the correct data", async () => {
+            await service.uploadZisBundle("integrationName", {
+                name: "zis:bundle"
+            });
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/services/zis/registry/integrationName/bundles`,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ name: "zis:bundle" })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
