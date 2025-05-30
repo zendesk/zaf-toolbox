@@ -12,7 +12,9 @@ import {
     ICustomObjectRecord,
     ListCutomObjectRecordsSortingOptions,
     ICustomObjectRecordField,
-    ISearchCustomObjectRecordsFilter
+    ISearchCustomObjectRecordsFilter,
+    IBulkJobResponse,
+    IBulkJobBody
 } from "@models/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
 
@@ -231,6 +233,24 @@ export class CustomObjectService {
         return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, {
             query
         } as ISearchCustomObjectRecordsFilter);
+    }
+
+    /**
+     * Bulk create or update custom object records
+     * This endpoint allows you to create or update multiple custom object records in a single request.
+     * The job will be processed asynchronously, and you can check the status of the job using the job ID returned in the response.
+     *
+     * @param key - The custom object key
+     * @param job - The bulk job body containing the records to be created or updated
+     * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#custom-object-record-bulk-jobs
+     */
+    public async bulkJobsForRecords(key: string, job: IBulkJobBody): Promise<IBulkJobResponse> {
+        return this.client.request<any, IBulkJobResponse>({
+            url: `/api/v2/custom_objects/${key}/jobs`,
+            type: "POST",
+            contentType: CONTENT_TYPE,
+            data: JSON.stringify(job)
+        });
     }
 
     /**
