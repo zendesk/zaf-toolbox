@@ -1,6 +1,6 @@
 {
     "name": "@zendesk/zaf-toolbox",
-    "version": "0.5.0",
+    "version": "0.9.0",
     "description": "A toolbox for ZAF application built with 🩷 by Zendesk Labs",
     "main": "lib/src/index.js",
     "types": "lib/src/index.d.ts",
@@ -57,7 +57,7 @@
         "eslint-plugin-jsdoc": "^50.6.17",
         "eslint-plugin-prettier": "^5.4.0",
         "globals": "^16.2.0",
-        "gulp": "^5.0.0",
+        "gulp": "^5.0.1",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0",
         "prettier": "^3.5.3",
