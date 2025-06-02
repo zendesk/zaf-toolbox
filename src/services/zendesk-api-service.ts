@@ -481,4 +481,19 @@ export class ZendeskApiService {
             })
         });
     }
+
+    /**
+     * Fetches the ZIS integration by name.
+     *
+     * @param {string} integrationName - The name of the ZIS integration.
+     * @returns {Promise<void>} - The ZIS integration object.
+     **/
+    public async uploadZisBundle(integrationName: string, bundle: unknown): Promise<void> {
+        return await this.client.request({
+            url: `/api/services/zis/registry/${integrationName}/bundles`,
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(bundle)
+        });
+    }
 }
