@@ -148,7 +148,7 @@ export class ZendeskApiService {
         fetchAllUsers = true
     ): Promise<IZendeskUser<T>[]> {
         return this.fetchAllPaginatedResults<ISearchUserResults<T>, IZendeskUser<T>>(
-            `/api/v2/users/search?query=${encodeURI(query)}`,
+            `/api/v2/users/search?query=${encodeURIComponent(query)}`,
             fetchAllUsers,
             (response) => response.users
         );

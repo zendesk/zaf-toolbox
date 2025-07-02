@@ -220,7 +220,9 @@ describe("ZendeskService", () => {
 
                 const users = await service.searchUsers(searchQuery);
 
-                expect(requestMock).toHaveBeenCalledWith(`/api/v2/users/search?query=${encodeURI(searchQuery)}`);
+                expect(requestMock).toHaveBeenCalledWith(
+                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                );
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
             });
@@ -233,7 +235,10 @@ describe("ZendeskService", () => {
                 const users = await service.searchUsers(searchQuery);
 
                 expect(requestMock).toHaveBeenCalledTimes(2);
-                expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/users/search?query=${encodeURI(searchQuery)}`);
+                expect(requestMock).toHaveBeenNthCalledWith(
+                    1,
+                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                );
                 expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
@@ -245,7 +250,9 @@ describe("ZendeskService", () => {
                 const users = await service.searchUsers(searchQuery, false);
 
                 expect(requestMock).toHaveBeenCalledTimes(1);
-                expect(requestMock).toHaveBeenCalledWith(`/api/v2/users/search?query=${encodeURI(searchQuery)}`);
+                expect(requestMock).toHaveBeenCalledWith(
+                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                );
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
             });
