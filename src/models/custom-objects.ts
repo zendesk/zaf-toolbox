@@ -72,7 +72,8 @@ enum DELETEDStatusExtends {
 type ITemplateStatus = TemplateStatus | SMSStatusExtends | DELETEDStatusExtends;
 export const ITemplateStatus = { ...TemplateStatus, ...SMSStatusExtends, ...DELETEDStatusExtends };
 
-export type ICustomObjectRecordField = Record<string, string>;
+export type PossibleValueForCustomField = string | number | boolean;
+export type ICustomObjectRecordField = Record<string, PossibleValueForCustomField>;
 
 export interface ICustomObjectRecord<T extends ICustomObjectRecordField> {
     created_at: string;
