@@ -350,6 +350,36 @@ describe("CustomObjectService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
 
+        it("should call Zendesk API with filter correctly", async () => {
+            requestMock.mockResolvedValueOnce({
+                custom_object_records: [customObjectRecord],
+                meta: {
+                    has_more: false
+                }
+            });
+
+            const filter = {
+                filter: {
+                    "$and": [
+                        {
+                            "custom_object_fields.color": {
+                                "$eq": "Red"
+                            }
+                        }
+                    ]
+                }
+            };
+            await service.filterRecords("foo", filter);
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records/search`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(filter)
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+
         it("should keep sort threw all pages ", async () => {
             requestMock
                 .mockResolvedValueOnce({

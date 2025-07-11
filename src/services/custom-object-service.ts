@@ -14,7 +14,8 @@ import {
     ICustomObjectRecordField,
     ISearchCustomObjectRecordsFilter,
     IBulkJobResponse,
-    IBulkJobBody
+    IBulkJobBody,
+    ISearchFilterCustomObjectRecords
 } from "@models/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
 
@@ -236,6 +237,56 @@ export class CustomObjectService {
     }
 
     /**
+     * Filter custom object records using advanced search criteria
+     *
+     * This method performs a filtered search of custom object records using POST request with complex filter conditions.
+     * Filters can contain individual comparison objects or arrays of comparison objects within logical namespaces ($and, $or).
+     *
+     * @param key - The custom object key identifier
+     * @param filter - The search filter object containing comparison conditions
+     * @param filter.filter - A JSON object with the following properties:
+     * - ATTRIBUTE: A comparison object specifying an attribute value condition
+     * - $and: Array of conjunctive filter objects (logical AND)
+     * - $or: Array of disjunctive filter objects (logical OR)
+     *
+     * @returns Promise that resolves to an array of custom object records matching the filter criteria
+     *
+     * @example
+     * ```typescript
+     * // Simple attribute filter
+     * const records = await service.filterRecords('my_object', {
+     *   filter: {
+     *     "custom_object_fields.field_key": { "$eq": "value" }
+     *   }
+     * });
+     *
+     * // Using logical OR
+     * const records = await service.filterRecords('my_object', {
+     *   filter: {
+     *     "$or": [
+     *       { "custom_object_fields.field_key": { "$eq": "value" } },
+     *       { "external_id": { "$eq": "Record123" } }
+     *     ]
+     *   }
+     * });
+     * ```
+     *
+     * @remarks
+     * - Custom fields must be namespaced with `custom_object_fields.` (e.g., `custom_object_fields.field_key`)
+     * - Standard fields (created_at, updated_at, created_by_user, updated_by_user, name, external_id) require no namespace
+     * - Supported operators vary by the value's data type
+     * - This method uses pagination internally to fetch all matching records
+     *
+     * @see {@link https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#filtered-search-of-custom-object-records | Zendesk API Documentation}
+     */
+    public async filterRecords<T extends ICustomObjectRecordField>(
+        key: string,
+        filter: ISearchFilterCustomObjectRecords
+    ): Promise<ICustomObjectRecord<T>[]> {
+        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, filter, "POST");
+    }
+
+    /**
      * Bulk create or update custom object records
      * This endpoint allows you to create or update multiple custom object records in a single request.
      * The job will be processed asynchronously, and you can check the status of the job using the job ID returned in the response.
@@ -263,25 +314,40 @@ export class CustomObjectService {
      */
     private async fetchAllPaginatedRecords<T extends ICustomObjectRecordField>(
         url: string,
-        initialData: IListFilter
+        initialData: IListFilter | ISearchFilterCustomObjectRecords,
+        method: "GET" | "POST" | "PATCH" | "DELETE" = "GET"
     ): Promise<ICustomObjectRecord<T>[]> {
         let hasMore = true;
-        let data = initialData;
+        let d = initialData;
         let objects: ICustomObjectRecord<T>[] = [];
 
         do {
-            const response = await this.client.request<any, IListCustomObjectRecordsResponse<T>>({
+            let options: {
+                url: string;
+                type: "GET" | "POST" | "PATCH" | "DELETE";
+                contentType: string;
+                data?: unknown;
+            } = {
                 url,
-                type: "GET",
+                type: method,
                 contentType: CONTENT_TYPE,
-                data
-            });
+                data: d
+            };
+
+            if (method === "POST") {
+                options = {
+                    ...options,
+                    data: JSON.stringify(d)
+                };
+            }
+
+            const response = await this.client.request<any, IListCustomObjectRecordsResponse<T>>(options);
 
             objects = [...objects, ...response.custom_object_records];
 
             hasMore = response.meta.has_more;
             if (hasMore) {
-                data = {
+                d = {
                     page: {
                         after: response.meta.after_cursor
                     },

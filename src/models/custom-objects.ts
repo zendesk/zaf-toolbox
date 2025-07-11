@@ -111,17 +111,7 @@ export enum ListCutomObjectRecordsSortingOptions {
     MINUS_UPDATED_AT = "-updated_at"
 }
 
-export interface IListFilter {
-    filter?: {
-        /**
-         * Comma separated list of external ids of records
-         */
-        external_ids?: string;
-        /**
-         * Comma separated list of records ids
-         */
-        ids?: string;
-    };
+interface IPaginationAndSortCursor {
     page?: {
         /**
          * A pagination cursor that tells the endpoint which page to start on. Note: page[before] and page[after] can't be used together in the same request.
@@ -141,7 +131,30 @@ export interface IListFilter {
      */
     sort?: ListCutomObjectRecordsSortingOptions;
 }
-
+export interface IListFilter extends IPaginationAndSortCursor {
+    filter?: {
+        /**
+         * Comma separated list of external ids of records
+         */
+        external_ids?: string;
+        /**
+         * Comma separated list of records ids
+         */
+        ids?: string;
+    };
+}
+type ISearchFilterComparaison = Record<
+    string,
+    {
+        "$eq"?: string | number | boolean;
+    }
+>;
+export interface ISearchFilterCustomObjectRecords extends IPaginationAndSortCursor {
+    filter?: {
+        "$or"?: ISearchFilterComparaison[];
+        "$and"?: ISearchFilterComparaison[];
+    };
+}
 export interface ISearchCustomObjectRecordsFilter extends IListFilter {
     query: string;
 }
