@@ -85,7 +85,7 @@ jobs:
             - uses: zendesk/checkout@v4
             - uses: zendesk/setup-node@v4
               with:
-                  node-version: 18
+                  node-version: 20
                   cache: "npm"
                   cache-dependency-path: "package-lock.json"
             - name: Install dependencies
@@ -103,7 +103,7 @@ jobs:
             - uses: zendesk/checkout@v4
             - uses: zendesk/setup-node@v4
               with:
-                  node-version: 18
+                  node-version: 20
                   cache: "npm"
                   cache-dependency-path: "package-lock.json"
             - name: Install dependencies
@@ -120,7 +120,7 @@ jobs:
             - uses: zendesk/checkout@v4
             - uses: zendesk/setup-node@v4
               with:
-                  node-version: 18
+                  node-version: 20
                   cache: "npm"
                   cache-dependency-path: "package-lock.json"
             - name: Install dependencies
