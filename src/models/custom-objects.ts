@@ -146,7 +146,16 @@ export interface IListFilter extends IPaginationAndSortCursor {
 type ISearchFilterComparaison = Record<
     string,
     {
-        "$eq"?: string | number | boolean;
+        "$eq"?: PossibleValueForCustomField;
+        "$noteq"?: PossibleValueForCustomField;
+        "$gt"?: PossibleValueForCustomField;
+        "$gte"?: PossibleValueForCustomField;
+        "$lt"?: PossibleValueForCustomField;
+        "$lte"?: PossibleValueForCustomField;
+        "$exists"?: boolean;
+        "$notin"?: PossibleValueForCustomField[];
+        "$notcontains"?: PossibleValueForCustomField;
+        "$contains"?: PossibleValueForCustomField;
     }
 >;
 export interface ISearchFilterCustomObjectRecords extends IPaginationAndSortCursor {
