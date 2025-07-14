@@ -147,6 +147,8 @@ type ISearchFilterComparaison = Record<
     string,
     {
         "$eq"?: string | number | boolean;
+        "$gt"?: string | number | boolean;
+        "$contains"?: string | number | boolean;
     }
 >;
 export interface ISearchFilterCustomObjectRecords extends IPaginationAndSortCursor {
