@@ -278,9 +278,29 @@ export class CustomObjectService {
      */
     public async filterRecords<T extends ICustomObjectRecordField>(
         key: string,
-        filter: ISearchFilterCustomObjectRecords
-    ): Promise<ICustomObjectRecord<T>[]> {
-        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, filter, "POST");
+        filter: ISearchFilterCustomObjectRecords,
+        fetchAllPages: true
+    ): Promise<ICustomObjectRecord<T>[]>;
+    public async filterRecords<T extends ICustomObjectRecordField>(
+        key: string,
+        filter: ISearchFilterCustomObjectRecords,
+        fetchAllPages: false
+    ): Promise<IListCustomObjectRecordsResponse<T>>;
+    public async filterRecords<T extends ICustomObjectRecordField>(
+        key: string,
+        filter: ISearchFilterCustomObjectRecords,
+        fetchAllPages = true
+    ): Promise<ICustomObjectRecord<T>[] | IListCustomObjectRecordsResponse<T>> {
+        if (fetchAllPages) {
+            return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, filter, "POST");
+        } else {
+            return this.client.request<any, IListCustomObjectRecordsResponse<T>>({
+                url: `/api/v2/custom_objects/${key}/records/search`,
+                type: "POST",
+                contentType: CONTENT_TYPE,
+                data: JSON.stringify(filter)
+            });
+        }
     }
 
     /**
