@@ -279,7 +279,7 @@ export class CustomObjectService {
     public async filterRecords<T extends ICustomObjectRecordField>(
         key: string,
         filter: ISearchFilterCustomObjectRecords,
-        fetchAllPages: true
+        fetchAllPages?: true
     ): Promise<ICustomObjectRecord<T>[]>;
     public async filterRecords<T extends ICustomObjectRecordField>(
         key: string,
