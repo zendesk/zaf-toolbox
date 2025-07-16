@@ -225,7 +225,8 @@ describe("CustomObjectService", () => {
                 name: "foo",
                 custom_object_fields: {
                     test: "true"
-                }
+                },
+                external_id: "12345"
             } as unknown as ICreateCustomObjectRecordBody<Record<string, string>>;
             await service.createCustomObjectRecord("foo", body);
 

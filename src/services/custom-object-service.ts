@@ -177,10 +177,7 @@ export class CustomObjectService {
             type: "POST",
             contentType: CONTENT_TYPE,
             data: JSON.stringify({
-                custom_object_record: {
-                    name: body.name,
-                    custom_object_fields: body.custom_object_fields
-                }
+                custom_object_record: body
             })
         });
 
