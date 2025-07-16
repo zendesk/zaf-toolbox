@@ -15,7 +15,8 @@ import {
     ISearchCustomObjectRecordsFilter,
     IBulkJobResponse,
     IBulkJobBody,
-    ISearchFilterCustomObjectRecords
+    ISearchFilterCustomObjectRecords,
+    ISetCustomObjectRecordFieldBody
 } from "@models/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
 
@@ -213,7 +214,7 @@ export class CustomObjectService {
      */
     public async setCustomObjectRecordByExternalId<T extends ICustomObjectRecordField>(
         key: string,
-        body: ICreateCustomObjectRecordBody<T>,
+        body: ISetCustomObjectRecordFieldBody<T>,
         externalId: string
     ): Promise<ICustomObjectRecord<T>> {
         const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
