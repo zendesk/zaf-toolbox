@@ -348,14 +348,10 @@ export class CustomObjectService {
             hasMore = response.meta.has_more;
             if (hasMore) {
                 d = {
+                    ...initialData,
                     page: {
                         after: response.meta.after_cursor
-                    },
-                    ...(initialData.sort
-                        ? {
-                              sort: initialData.sort
-                          }
-                        : undefined)
+                    }
                 } as IListFilter;
             }
         } while (hasMore);
