@@ -208,6 +208,31 @@ export class CustomObjectService {
     }
 
     /**
+     * Set custom object record by external ID for a custom objects
+     * More information: https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#set-custom-object-record-by-external-id-or-name
+     */
+    public async setCustomObjectRecordByExternalId<T extends ICustomObjectRecordField>(
+        key: string,
+        body: ICreateCustomObjectRecordBody<T>,
+        externalId: string
+    ): Promise<ICustomObjectRecord<T>> {
+        const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
+            url: `/api/v2/custom_objects/${key}/records?external_id=${externalId}`,
+            type: "PATCH",
+            contentType: CONTENT_TYPE,
+            data: JSON.stringify({
+                custom_object_record: {
+                    name: body.name,
+                    custom_object_fields: body.custom_object_fields,
+                    external_id: externalId
+                }
+            })
+        });
+
+        return custom_object_record;
+    }
+
+    /**
      * Delete custom object record for a custom objects
      */
     public async deleteCustomObjectRecord(key: string, id: string): Promise<void> {
