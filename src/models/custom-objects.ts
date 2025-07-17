@@ -214,6 +214,7 @@ export interface IListCustomObjectFieldsResponse {
 }
 
 export interface IListCustomObjectRecordsResponse<T extends ICustomObjectRecordField> {
+    count: number;
     custom_object_records: ICustomObjectRecord<T>[];
     meta: IZendeskMeta;
 }
