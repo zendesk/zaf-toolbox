@@ -130,7 +130,7 @@ interface Capabilities {
 export type Line = DigitalLine | PhoneLine;
 
 export enum MessageStatus {
-    RECEIVED = "received",
+    DELIVERED = "delivered",
     UNDELIVERED = "undelivered",
     FAILED = "failed"
 }
