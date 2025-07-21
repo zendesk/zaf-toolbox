@@ -263,6 +263,33 @@ describe("CustomObjectService", () => {
             });
         });
 
+        it("should call set by external id with the correct parameters", async () => {
+            requestMock.mockResolvedValueOnce({
+                "custom_object_record": customObjectRecord
+            });
+
+            const body = {
+                name: "foo",
+                custom_object_fields: {
+                    test: "false"
+                }
+            } as unknown as ICreateCustomObjectRecordBody<Record<string, string>>;
+            await service.setCustomObjectRecordByExternalId("foo", body, "external_id");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/custom_objects/foo/records?external_id=external_id`,
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    custom_object_record: {
+                        name: body.name,
+                        custom_object_fields: body.custom_object_fields,
+                        external_id: "external_id"
+                    }
+                })
+            });
+        });
+
         it("should call delete with the correct key", async () => {
             requestMock.mockResolvedValueOnce({});
 
@@ -428,6 +455,39 @@ describe("CustomObjectService", () => {
                 })
             });
             expect(requestMock).toHaveBeenCalledTimes(2);
+        });
+
+        it("should return only first page of records if fetchAllPages is false", async () => {
+            const mockResponse = {
+                count: 300,
+                custom_object_records: [customObjectRecord],
+                meta: {
+                    has_more: true,
+                    after_cursor: "1"
+                }
+            };
+            requestMock.mockResolvedValueOnce(mockResponse);
+
+            const filter = {
+                filter: {
+                    "$and": [
+                        {
+                            "custom_object_fields.color": {
+                                "$eq": "Red"
+                            }
+                        }
+                    ]
+                }
+            };
+            const res = await service.filterRecords("foo", filter, false);
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records/search`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(filter)
+            });
+            expect(res).toStrictEqual(mockResponse);
         });
 
         it("should keep sort threw all pages ", async () => {

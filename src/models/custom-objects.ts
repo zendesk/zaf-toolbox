@@ -168,6 +168,11 @@ export interface ISearchCustomObjectRecordsFilter extends IListFilter {
     query: string;
 }
 
+export interface ISetCustomObjectRecordFieldBody<T extends ICustomObjectRecordField> {
+    custom_object_fields: Partial<T>;
+    name: string;
+}
+
 export interface ICreateCustomObjectRecordBody<T extends ICustomObjectRecordField> {
     custom_object_fields: T;
     external_id?: string;
@@ -214,6 +219,7 @@ export interface IListCustomObjectFieldsResponse {
 }
 
 export interface IListCustomObjectRecordsResponse<T extends ICustomObjectRecordField> {
+    count: number;
     custom_object_records: ICustomObjectRecord<T>[];
     meta: IZendeskMeta;
 }
