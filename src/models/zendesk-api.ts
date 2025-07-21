@@ -131,7 +131,6 @@ export type Line = DigitalLine | PhoneLine;
 
 export enum MessageStatus {
     DELIVERED = "delivered",
-    RECEIVED = "received",
     UNDELIVERED = "undelivered",
     FAILED = "failed"
 }
