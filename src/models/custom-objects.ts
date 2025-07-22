@@ -9,7 +9,8 @@ export enum CustomObjectFieldType {
     Decimal = "decimal",
     Regexp = "regexp",
     Dropdown = "dropdown",
-    Lookup = "lookup"
+    Lookup = "lookup",
+    Multiselect = "multiselect"
 }
 
 export interface ICustomObjectDefinition {
