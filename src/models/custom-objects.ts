@@ -187,7 +187,7 @@ export interface ISearchCustomObjectRecordsFilter extends IListFilter {
 
 export interface ISetCustomObjectRecordFieldBody<T extends ICustomObjectRecordField> {
     custom_object_fields: Partial<T>;
-    name: string;
+    name?: string;
 }
 
 export interface ICreateCustomObjectRecordBody<T extends ICustomObjectRecordField> {
