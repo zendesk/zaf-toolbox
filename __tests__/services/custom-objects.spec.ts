@@ -139,6 +139,27 @@ describe("CustomObjectService", () => {
             });
         });
 
+        it("should call update with the correct parameters", async () => {
+            requestMock.mockResolvedValueOnce({});
+
+            const body = {
+                properties: {
+                    autoincrement_enabled: true,
+                    is_unique: false
+                }
+            };
+            await service.updateCustomObjectField("foo", "name", body);
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/custom_objects/foo/fields/name`,
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    custom_object_field: body
+                })
+            });
+        });
+
         it("should call delete with the correct key", async () => {
             requestMock.mockResolvedValueOnce({});
 
