@@ -105,6 +105,22 @@ export interface ICreateCustomObjectFieldRequestBody {
     relationship_target_type?: string;
 }
 
+export interface IUpdateCustomObjectFieldBody {
+    title: string;
+    type: CustomObjectFieldType;
+    relationship_target_type?: string;
+}
+
+export interface IUpdateCustomObjectFieldAutonumberingPropertiesBody {
+    properties: {
+        autoincrement_enabled?: boolean;
+        autoincrement_prefix?: string;
+        autoincrement_padding?: number;
+        autoincrement_next_sequence?: number;
+        is_unique?: boolean;
+    };
+}
+
 export enum ListCutomObjectRecordsSortingOptions {
     ID = "id",
     UPDATED_AT = "updated_at",
@@ -171,7 +187,7 @@ export interface ISearchCustomObjectRecordsFilter extends IListFilter {
 
 export interface ISetCustomObjectRecordFieldBody<T extends ICustomObjectRecordField> {
     custom_object_fields: Partial<T>;
-    name: string;
+    name?: string;
 }
 
 export interface ICreateCustomObjectRecordBody<T extends ICustomObjectRecordField> {

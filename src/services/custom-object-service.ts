@@ -16,7 +16,9 @@ import {
     IBulkJobResponse,
     IBulkJobBody,
     ISearchFilterCustomObjectRecords,
-    ISetCustomObjectRecordFieldBody
+    ISetCustomObjectRecordFieldBody,
+    IUpdateCustomObjectFieldAutonumberingPropertiesBody,
+    IUpdateCustomObjectFieldBody
 } from "@models/index";
 import { Client } from "@zendesk/sell-zaf-app-toolbox";
 
@@ -103,6 +105,30 @@ export class CustomObjectService {
         return this.client.request<any, ICustomObjectFieldResponse>({
             url: `/api/v2/custom_objects/${key}/fields`,
             type: "POST",
+            contentType: CONTENT_TYPE,
+            data: JSON.stringify({
+                custom_object_field: body
+            })
+        });
+    }
+
+    /**
+     * Update a custom object field and associate to a custom object
+     * More information: https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_fields/#update-custom-object-field
+     *
+     * @param key - The custom object key
+     * @param fieldKeyOrId - The custom object field key or ID
+     * @param body - The body containing the field properties to update
+     * @returns The updated custom object field response
+     */
+    public async updateCustomObjectField(
+        key: string,
+        fieldKeyOrId: string,
+        body: IUpdateCustomObjectFieldAutonumberingPropertiesBody | IUpdateCustomObjectFieldBody
+    ): Promise<ICustomObjectFieldResponse> {
+        return this.client.request<any, ICustomObjectFieldResponse>({
+            url: `/api/v2/custom_objects/${key}/fields/${fieldKeyOrId}`,
+            type: "PATCH",
             contentType: CONTENT_TYPE,
             data: JSON.stringify({
                 custom_object_field: body
