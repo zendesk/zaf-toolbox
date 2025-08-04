@@ -61,7 +61,7 @@
         "jest": "^30.0.5",
         "jest-environment-jsdom": "^30.0.5",
         "prettier": "^3.6.2",
-        "ts-jest": "^29.4.0",
+        "ts-jest": "^29.4.1",
         "ts-node": "^10.9.1",
         "tsconfig-paths": "^4.2.0",
         "tscpaths": "^0.0.9",
