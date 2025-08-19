@@ -15,7 +15,7 @@ jobs:
         outputs:
             version: ${{ steps.package_version.outputs.version }}
         steps:
-            - uses: zendesk/checkout@v4
+            - uses: zendesk/checkout@v5
             - name: Get Package version
               id: package_version
               run: |
@@ -43,7 +43,7 @@ jobs:
             packages: write
             contents: read
         steps:
-            - uses: zendesk/checkout@v4
+            - uses: zendesk/checkout@v5
             - uses: zendesk/setup-node@v4
               with:
                   node-version: 20
