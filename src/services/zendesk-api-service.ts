@@ -27,7 +27,8 @@ import {
     IMessage,
     IMessagesResults,
     IListFilter,
-    ICreateAccessTokenResponse
+    ICreateAccessTokenResponse,
+    IZendeskTicket
 } from "@models/index";
 import {
     ICreateConnectionResponse,
@@ -241,6 +242,26 @@ export class ZendeskApiService {
             }
         });
     }
+
+    /**
+     * Create a ticket
+     *
+     * @link https://developer.zendesk.com/api-reference/ticketing/tickets/tickets/#create-ticket
+     * @param ticket The ticket to create
+     * @returns {IZendeskTicket}
+     */
+    public async createTicket(
+        ticket: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">
+    ): Promise<IZendeskTicket> {
+        return await this.client.request<IZendeskTicket>({
+            url: `/api/v2/tickets`,
+            type: "POST",
+            data: JSON.stringify({
+                ticket
+            })
+        });
+    }
+
     /**
      * Fetch all user instance tags
      */

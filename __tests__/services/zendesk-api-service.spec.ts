@@ -841,4 +841,33 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("createTicket", () => {
+        it("should create a ticket with the correct data", async () => {
+            await service.createTicket({
+                subject: "test",
+                requester_id: 123,
+                type: "problem",
+                comment: {
+                    body: "Super important issue"
+                }
+            });
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/tickets`,
+                type: "POST",
+                data: JSON.stringify({
+                    ticket: {
+                        subject: "test",
+                        requester_id: 123,
+                        type: "problem",
+                        comment: {
+                            body: "Super important issue"
+                        }
+                    }
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
