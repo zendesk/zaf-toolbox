@@ -1,15 +1,15 @@
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 /**
  * Get a value from the client
  */
-export async function getFromClient<T = unknown>(client: Client, path: string): Promise<T>;
-export async function getFromClient<T = unknown>(client: Client, path: string[]): Promise<Record<string, T>>;
+export async function getFromClient<T = unknown>(client: IClient, path: string): Promise<T>;
+export async function getFromClient<T = unknown>(client: IClient, path: string[]): Promise<Record<string, T>>;
 export async function getFromClient<T = unknown>(
-    client: Client,
+    client: IClient,
     path: string | string[]
 ): Promise<T | Record<string, T>> {
-    const data = await client.get<Record<string, T>>(path);
+    const data = await client.get<T>(path);
 
     if (path instanceof Array) {
         return data;

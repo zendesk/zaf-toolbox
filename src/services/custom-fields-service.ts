@@ -2,7 +2,7 @@ import { MissingCustomFields } from "@errors/index";
 import { ICustomFields, IRequirement } from "@models/index";
 import { ZendeskApiService } from "@services/index";
 import { getFromClient } from "@utils/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 export class CustomFieldsService {
     /**
@@ -16,7 +16,7 @@ export class CustomFieldsService {
     private pathOfIds: string[];
 
     public constructor(
-        private readonly client: Client,
+        private readonly client: IClient,
         private readonly zendeskApiService: ZendeskApiService,
         private readonly identifiers: string[],
         private readonly fetchFromAPI = false

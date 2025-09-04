@@ -1,6 +1,6 @@
 import { ICustomObjectDefinition } from "@models/custom-objects";
 import { CustomObjectService } from "@services/custom-object-service";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 /**
  * Admin role string
@@ -19,11 +19,11 @@ const ZENDESK_USER_ROLE = "currentUser.role";
  * @throws Error if something happens during the installation
  */
 export async function createCustomObject(
-    client: Client,
+    client: IClient,
     settingsName: string,
     customObjectDefinition: ICustomObjectDefinition
 ): Promise<void> {
-    const metadata = await client.metadata<Record<typeof settingsName, string>>();
+    const metadata = await client.metadata();
 
     // Check if config already set
     if (metadata.settings[settingsName] === "true") {
@@ -32,7 +32,7 @@ export async function createCustomObject(
     }
 
     // User doesn't have the permission to create custom objects
-    const response = await client.get<{ [ZENDESK_USER_ROLE]: string }>(ZENDESK_USER_ROLE);
+    const response = await client.get(ZENDESK_USER_ROLE);
     if (response[ZENDESK_USER_ROLE] !== ADMIN_ROLE) {
         throw new Error("no-admin");
     }
@@ -66,7 +66,7 @@ export async function createCustomObject(
 /**
  * Update the hidden config to not run this script again
  */
-async function updateConfig(client: Client, installationId: number, settingsName: string): Promise<void> {
+async function updateConfig(client: IClient, installationId: number, settingsName: string): Promise<void> {
     // Special case in development environment
     // It's when our zcli.config have settingsName is set as false
     // With zcli_apps=true our application installationId is a string
@@ -81,7 +81,7 @@ async function updateConfig(client: Client, installationId: number, settingsName
 
     await client.request({
         url: `/api/v2/apps/installations/${installationId}`,
-        method: "PUT",
+        type: "PUT",
         data: {
             settings: {
                 [settingsName]: "true"

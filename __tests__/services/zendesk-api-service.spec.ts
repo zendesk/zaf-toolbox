@@ -10,7 +10,7 @@ import {
 } from "@models/index";
 import { UPDATE_USER_FIELD_MAX_USERS, ZendeskApiService } from "@services/zendesk-api-service";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 describe("ZendeskService", () => {
     const ticketId = 123;
@@ -20,7 +20,7 @@ describe("ZendeskService", () => {
     const service = new ZendeskApiService({
         request: requestMock,
         get: getMock
-    } as unknown as Client);
+    } as unknown as IClient);
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -207,7 +207,9 @@ describe("ZendeskService", () => {
                 requestMock.mockResolvedValueOnce({ user: userSample });
                 const result = await service.getUser(123);
 
-                expect(requestMock).toHaveBeenCalledWith(`/api/v2/users/123`);
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/123`
+                });
                 expect(result).toBe(userSample);
             });
         });
@@ -220,9 +222,9 @@ describe("ZendeskService", () => {
 
                 const users = await service.searchUsers(searchQuery);
 
-                expect(requestMock).toHaveBeenCalledWith(
-                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
-                );
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                });
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
             });
@@ -235,11 +237,12 @@ describe("ZendeskService", () => {
                 const users = await service.searchUsers(searchQuery);
 
                 expect(requestMock).toHaveBeenCalledTimes(2);
-                expect(requestMock).toHaveBeenNthCalledWith(
-                    1,
-                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
-                );
-                expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                expect(requestMock).toHaveBeenNthCalledWith(1, {
+                    url: `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                });
+                expect(requestMock).toHaveBeenNthCalledWith(2, {
+                    url: "next_page"
+                });
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
             });
@@ -250,9 +253,9 @@ describe("ZendeskService", () => {
                 const users = await service.searchUsers(searchQuery, false);
 
                 expect(requestMock).toHaveBeenCalledTimes(1);
-                expect(requestMock).toHaveBeenCalledWith(
-                    `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
-                );
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/search?query=${encodeURIComponent(searchQuery)}`
+                });
                 expect(users).toHaveLength(1);
                 expect(users[0]).toBe(userSample);
             });
@@ -264,7 +267,9 @@ describe("ZendeskService", () => {
 
                 const userFields = await service.getUserFields();
 
-                expect(requestMock).toHaveBeenCalledWith(`/api/v2/user_fields`);
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/user_fields`
+                });
                 expect(userFields).toHaveLength(1);
                 expect(userFields[0]).toBe(userFieldSample);
             });
@@ -277,8 +282,12 @@ describe("ZendeskService", () => {
                 const userFields = await service.getUserFields();
 
                 expect(requestMock).toHaveBeenCalledTimes(2);
-                expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/user_fields`);
-                expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                expect(requestMock).toHaveBeenNthCalledWith(1, {
+                    url: `/api/v2/user_fields`
+                });
+                expect(requestMock).toHaveBeenNthCalledWith(2, {
+                    url: "next_page"
+                });
                 expect(userFields).toHaveLength(1);
                 expect(userFields[0]).toBe(userFieldSample);
             });
@@ -289,7 +298,9 @@ describe("ZendeskService", () => {
                 const userFields = await service.getUserFields(false);
 
                 expect(requestMock).toHaveBeenCalledTimes(1);
-                expect(requestMock).toHaveBeenCalledWith(`/api/v2/user_fields`);
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/user_fields`
+                });
                 expect(userFields).toHaveLength(1);
                 expect(userFields[0]).toBe(userFieldSample);
             });
@@ -332,7 +343,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getTags();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/tags`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/tags`
+                    });
                     expect(result).toEqual(tags);
                 });
 
@@ -345,8 +358,12 @@ describe("ZendeskService", () => {
                     const result = await service.getTags();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/tags`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/tags`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(tags);
                 });
 
@@ -357,7 +374,9 @@ describe("ZendeskService", () => {
                     const result = await service.getTags(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/tags`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/tags`
+                    });
                     expect(result).toEqual(tags);
                 });
             });
@@ -369,7 +388,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getGroups();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/groups`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/groups`
+                    });
                     expect(result).toEqual(groups);
                 });
 
@@ -382,8 +403,12 @@ describe("ZendeskService", () => {
                     const result = await service.getGroups();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/groups`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/groups`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(groups);
                 });
 
@@ -394,7 +419,9 @@ describe("ZendeskService", () => {
                     const result = await service.getGroups(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/groups`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/groups`
+                    });
                     expect(result).toEqual(groups);
                 });
             });
@@ -406,7 +433,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getOrganizations();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/organizations`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/organizations`
+                    });
                     expect(result).toEqual(organizations);
                 });
 
@@ -419,8 +448,12 @@ describe("ZendeskService", () => {
                     const result = await service.getOrganizations();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/organizations`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/organizations`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(organizations);
                 });
 
@@ -431,7 +464,9 @@ describe("ZendeskService", () => {
                     const result = await service.getOrganizations(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/organizations`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/organizations`
+                    });
                     expect(result).toEqual(organizations);
                 });
             });
@@ -443,7 +478,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getRoles();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/custom_roles`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/custom_roles`
+                    });
                     expect(result).toEqual(custom_roles);
                 });
 
@@ -456,8 +493,12 @@ describe("ZendeskService", () => {
                     const result = await service.getRoles();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/custom_roles`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/custom_roles`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(custom_roles);
                 });
 
@@ -468,7 +509,9 @@ describe("ZendeskService", () => {
                     const result = await service.getRoles(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/custom_roles`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/custom_roles`
+                    });
                     expect(result).toEqual(custom_roles);
                 });
             });
@@ -479,7 +522,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getLocales();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/locales`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/locales`
+                    });
                     expect(result).toEqual(locales);
                 });
             });
@@ -491,7 +536,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getVoiceLines();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/voice/lines`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/channels/voice/lines`
+                    });
                     expect(result).toEqual(lines);
                 });
 
@@ -504,8 +551,12 @@ describe("ZendeskService", () => {
                     const result = await service.getVoiceLines();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/channels/voice/lines`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/channels/voice/lines`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(lines);
                 });
 
@@ -516,7 +567,9 @@ describe("ZendeskService", () => {
                     const result = await service.getVoiceLines(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/voice/lines`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/channels/voice/lines`
+                    });
                     expect(result).toEqual(lines);
                 });
             });
@@ -528,7 +581,9 @@ describe("ZendeskService", () => {
 
                     const result = await service.getMessageHistory();
 
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/sms/message_history.json`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/channels/sms/message_history.json`
+                    });
                     expect(result).toEqual(messages);
                 });
 
@@ -541,8 +596,12 @@ describe("ZendeskService", () => {
                     const result = await service.getMessageHistory();
 
                     expect(requestMock).toHaveBeenCalledTimes(2);
-                    expect(requestMock).toHaveBeenNthCalledWith(1, `/api/v2/channels/sms/message_history.json`);
-                    expect(requestMock).toHaveBeenNthCalledWith(2, "next_page");
+                    expect(requestMock).toHaveBeenNthCalledWith(1, {
+                        url: `/api/v2/channels/sms/message_history.json`
+                    });
+                    expect(requestMock).toHaveBeenNthCalledWith(2, {
+                        url: "next_page"
+                    });
                     expect(result).toEqual(messages);
                 });
 
@@ -553,7 +612,9 @@ describe("ZendeskService", () => {
                     const result = await service.getMessageHistory(false);
 
                     expect(requestMock).toHaveBeenCalledTimes(1);
-                    expect(requestMock).toHaveBeenCalledWith(`/api/v2/channels/sms/message_history.json`);
+                    expect(requestMock).toHaveBeenCalledWith({
+                        url: `/api/v2/channels/sms/message_history.json`
+                    });
                     expect(result).toEqual(messages);
                 });
             });
@@ -579,7 +640,7 @@ describe("ZendeskService", () => {
 
             expect(requestMock).toHaveBeenCalledWith({
                 url: `/api/services/zis/registry/integrations`,
-                method: "GET",
+                type: "GET",
                 contentType: "application/json"
             });
             expect(result).toEqual([zisIntegration]);
@@ -592,7 +653,7 @@ describe("ZendeskService", () => {
 
             expect(requestMock).toHaveBeenCalledWith({
                 url: `/api/services/zis/registry/${zisIntegration.name}`,
-                method: "POST",
+                type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({
                     description: zisIntegration.description
@@ -773,7 +834,7 @@ describe("ZendeskService", () => {
 
             expect(requestMock).toHaveBeenNthCalledWith(1, {
                 url: `/api/services/zis/registry/integrationName/bundles`,
-                method: "POST",
+                type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({ name: "zis:bundle" })
             });

@@ -21,7 +21,7 @@ import {
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 export class SunshineConversationApiService {
     private readonly BASE_URL_V1 = "https://api.smooch.io/v1.1";
@@ -33,7 +33,7 @@ export class SunshineConversationApiService {
 
     public constructor(
         private readonly settings: IServiceConfig,
-        private readonly client: Client
+        private readonly client: IClient
     ) {
         this.publicToken = this.settings.authorizationToken;
         this.useSecure = settings.useSecure;
@@ -104,7 +104,7 @@ export class SunshineConversationApiService {
             })}`;
         }
 
-        return await this.client.request<unknown, IIntegrationsResponse>(this.createV2Options(url, HttpMethod.GET));
+        return await this.client.request<IIntegrationsResponse>(this.createV2Options(url, HttpMethod.GET));
     }
 
     /**
@@ -133,7 +133,7 @@ export class SunshineConversationApiService {
         );
 
         try {
-            let response = await this.client.request<unknown, ITemplatesResponse>(options);
+            let response = await this.client.request<ITemplatesResponse>(options);
             templates = response.messageTemplates ?? [];
 
             while (response.after) {
@@ -141,7 +141,7 @@ export class SunshineConversationApiService {
                     `/apps/${this.settings.appId}/integrations/${whatsAppIntegrationId}/messageTemplates?limit=100&after=${response.after}`,
                     HttpMethod.GET
                 );
-                response = await this.client.request<unknown, ITemplatesResponse>(options);
+                response = await this.client.request<ITemplatesResponse>(options);
                 templates.push(...(response.messageTemplates as ITemplate[]));
             }
         } catch {
@@ -163,7 +163,7 @@ export class SunshineConversationApiService {
             HttpMethod.GET
         );
 
-        const response = await this.client.request<unknown, ITemplatesResponse>(options);
+        const response = await this.client.request<ITemplatesResponse>(options);
 
         if (!response.messageTemplates || response.messageTemplates.length === 0) {
             return;
@@ -184,7 +184,7 @@ export class SunshineConversationApiService {
             HttpMethod.POST,
             createTemplateBody
         );
-        return (await this.client.request<unknown, IResponse<IMessageTemplate>>(options)).responseJSON;
+        return (await this.client.request<IResponse<IMessageTemplate>>(options)).responseJSON;
     }
 
     /**
@@ -195,7 +195,7 @@ export class SunshineConversationApiService {
             `/apps/${this.settings.appId}/integrations/${whatsAppIntegrationId}/messageTemplates/${templateName}`,
             HttpMethod.DELETE
         );
-        await this.client.request<unknown, ITemplatesResponse>(options);
+        await this.client.request<ITemplatesResponse>(options);
     }
 
     /**
@@ -236,7 +236,7 @@ export class SunshineConversationApiService {
             ...(metadata && { metadata })
         };
 
-        const { responseJSON } = await this.client.request<unknown, IResponse<ISendNotification>>(
+        const { responseJSON } = await this.client.request<IResponse<ISendNotification>>(
             this.createV1Options(`/apps/${this.settings.appId}/notifications`, HttpMethod.POST, payload)
         );
 
@@ -256,7 +256,7 @@ export class SunshineConversationApiService {
         triggers: string[],
         includeClient: boolean
     ): Promise<ICreateSuncoWebhookResponse> {
-        return await this.client.request<unknown, ICreateSuncoWebhookResponse>(
+        return await this.client.request<ICreateSuncoWebhookResponse>(
             this.createV1Options(`/apps/${this.settings.appId}/webhooks`, HttpMethod.POST, {
                 target,
                 triggers,

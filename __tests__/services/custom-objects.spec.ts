@@ -6,7 +6,7 @@ import {
     IBulkJobBodyCreate
 } from "@models/custom-objects";
 import { CustomObjectService } from "@services/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 describe("CustomObjectService", () => {
     const requestMock = jest.fn();
@@ -15,7 +15,7 @@ describe("CustomObjectService", () => {
     const service = new CustomObjectService({
         request: requestMock,
         get: getMock
-    } as unknown as Client);
+    } as unknown as IClient);
 
     describe("CustomObject", () => {
         it("should call list with the correct parameters", async () => {
