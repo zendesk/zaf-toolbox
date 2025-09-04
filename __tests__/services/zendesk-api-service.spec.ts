@@ -856,7 +856,8 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenNthCalledWith(1, {
                 url: `/api/v2/tickets.json`,
                 type: "POST",
-                data: {
+                contentType: "application/json",
+                data: JSON.stringify({
                     ticket: {
                         subject: "test",
                         requester_id: 123,
@@ -865,7 +866,7 @@ describe("ZendeskService", () => {
                             body: "Super important issue"
                         }
                     }
-                }
+                })
             });
             expect(requestMock).toHaveBeenCalledTimes(1);
         });

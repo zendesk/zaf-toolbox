@@ -256,9 +256,10 @@ export class ZendeskApiService {
         return await this.client.request<IZendeskTicket>({
             url: "/api/v2/tickets.json",
             type: "POST",
-            data: {
+            contentType: "application/json",
+            data: JSON.stringify({
                 ticket
-            }
+            })
         });
     }
 
