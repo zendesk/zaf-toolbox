@@ -12,7 +12,8 @@
         "test:ci": "jest --coverage --ci --runInBand --verbose",
         "prettier": "prettier --check .",
         "prettier:fix-all": "prettier --write .",
-        "prettier:fix": "prettier --write $1"
+        "prettier:fix": "prettier --write $1",
+        "prepare": "npm run build"
     },
     "repository": {
         "type": "git",
