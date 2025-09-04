@@ -854,7 +854,7 @@ describe("ZendeskService", () => {
             });
 
             expect(requestMock).toHaveBeenNthCalledWith(1, {
-                url: `/api/v2/tickets.json`,
+                url: `/api/v2/tickets`,
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({

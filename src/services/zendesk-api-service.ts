@@ -254,7 +254,7 @@ export class ZendeskApiService {
         ticket: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">
     ): Promise<IZendeskTicket> {
         return await this.client.request<IZendeskTicket>({
-            url: "/api/v2/tickets.json",
+            url: "/api/v2/tickets",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
