@@ -871,4 +871,38 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("createManyTickets", () => {
+        it("should create many tickets with the correct data", async () => {
+            await service.createManyTickets([
+                {
+                    subject: "test",
+                    requester_id: 123,
+                    type: "problem",
+                    comment: {
+                        body: "Super important issue"
+                    }
+                }
+            ]);
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/create_many`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    tickets: [
+                        {
+                            subject: "test",
+                            requester_id: 123,
+                            type: "problem",
+                            comment: {
+                                body: "Super important issue"
+                            }
+                        }
+                    ]
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });

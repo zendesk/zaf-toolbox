@@ -28,7 +28,8 @@ import {
     IMessagesResults,
     IListFilter,
     ICreateAccessTokenResponse,
-    IZendeskTicket
+    IZendeskTicket,
+    IBulkJobResponse
 } from "@models/index";
 import {
     ICreateConnectionResponse,
@@ -259,6 +260,31 @@ export class ZendeskApiService {
             contentType: "application/json",
             data: JSON.stringify({
                 ticket
+            })
+        });
+    }
+
+    /**
+     * Create many tickets
+     * A limit of 100 tickets can be created at a time.
+     *
+     * @link https://developer.zendesk.com/api-reference/ticketing/tickets/tickets/#create-ticket
+     * @param ticket The ticket to create
+     * @returns {IZendeskTicket}
+     */
+    public async createManyTickets(
+        tickets: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">[]
+    ): Promise<IBulkJobResponse> {
+        if (tickets.length > 100) {
+            throw new Error("A limit of 100 tickets can be created at a time.");
+        }
+
+        return await this.client.request<IBulkJobResponse>({
+            url: "/api/v2/create_many",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                tickets
             })
         });
     }
