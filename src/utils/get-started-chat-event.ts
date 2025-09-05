@@ -1,19 +1,17 @@
 import { NotFoundError } from "@errors/not-found-error";
 import { IAuditEvent, IAuditResponse } from "@models/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 /**
  * Get the chat started event from the ticket audits
  *
  * @throws NotFoundError if the chat started event is not found or the ticket audit is not exist.
  */
-export async function getStartedChatEvent(client: Client, ticketId: number): Promise<IAuditEvent> {
-    const settings = {
+export async function getStartedChatEvent(client: IClient, ticketId: number): Promise<IAuditEvent> {
+    const { audits } = await client.request<IAuditResponse>({
         url: `/api/v2/tickets/${ticketId}/audits.json`,
         type: "GET"
-    };
-
-    const { audits } = await client.request<unknown, IAuditResponse>(settings);
+    });
 
     if (!audits) {
         throw new NotFoundError("Failed to get audits");

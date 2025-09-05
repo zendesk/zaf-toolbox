@@ -43,9 +43,8 @@ Here is a TL;DR; version of the installation guide:
 5. Create a `.npmrc` file at the root of your repository and copy the following on it: `@zendesk:registry=https://npm.pkg.github.com`
 6. Execute the following command:
     ```shell
-    npm i @zendesk/zaf-toolbox --legacy-peer-deps
+    npm i @zendesk/zaf-toolbox
     ```
-    The `--legacy-peer-deps` is needed because of the `@zendesk/sell-zaf-app-toolbox` dependency of this package.
 
 For more information on package installing through GitHub packages,
 see "[Installing a package](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#installing-a-package)".

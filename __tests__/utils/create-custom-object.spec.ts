@@ -1,6 +1,6 @@
 import { CustomObjectFieldType, ICustomObjectDefinition } from "@models/index";
 import { createCustomObject } from "@utils/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 const getCustomObjectMock = jest.fn();
 const createCustomObjectMock = jest.fn();
@@ -40,7 +40,7 @@ describe("createCustomObject", () => {
         request: requestMock,
         get: getMock,
         metadata: metadataMock
-    } as unknown as Client;
+    } as unknown as IClient;
 
     it("Should do nothing if the settings is not equal to false", async () => {
         metadataMock.mockResolvedValueOnce({
@@ -77,7 +77,7 @@ describe("createCustomObject", () => {
 
         expect(requestMock).toHaveBeenCalledWith({
             url: `/api/v2/apps/installations/12`,
-            method: "PUT",
+            type: "PUT",
             data: {
                 settings: {
                     is_custom_objects_setup_completed: "true"
@@ -170,7 +170,7 @@ describe("createCustomObject", () => {
         expect(createCustomObjectFieldMock).toHaveBeenCalledTimes(1);
         expect(requestMock).toHaveBeenCalledWith({
             url: `/api/v2/apps/installations/12`,
-            method: "PUT",
+            type: "PUT",
             data: {
                 settings: {
                     is_custom_objects_setup_completed: "true"

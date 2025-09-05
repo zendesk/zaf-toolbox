@@ -39,7 +39,7 @@ import {
 } from "@models/zendesk-integration-services";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 /**
  * Maximum number of users that can be updated when changing a user field value
@@ -47,7 +47,7 @@ import { Client } from "@zendesk/sell-zaf-app-toolbox";
 export const UPDATE_USER_FIELD_MAX_USERS = 90;
 
 export class ZendeskApiService {
-    public constructor(public client: Client) {}
+    public constructor(public client: IClient) {}
 
     /**
      * Generic method to fetch all paginated results from a given endpoint.
@@ -62,12 +62,20 @@ export class ZendeskApiService {
         fetchAll: boolean,
         extractArrayFn: (response: TResponse) => TItem[]
     ): Promise<TItem[]> {
-        const results: TResponse[] = [await this.client.request<string, TResponse>(url)];
+        const results: TResponse[] = [
+            await this.client.request<TResponse>({
+                url
+            })
+        ];
         if (fetchAll) {
             while (true) {
                 const nextPage = results[results.length - 1].next_page;
                 if (!nextPage) break;
-                results.push(await this.client.request<string, TResponse>(nextPage));
+                results.push(
+                    await this.client.request<TResponse>({
+                        url: nextPage
+                    })
+                );
             }
         }
 
@@ -93,7 +101,7 @@ export class ZendeskApiService {
      * Retrieve all ticket fields
      */
     public async getTicketFields(): Promise<ITicketField[]> {
-        const { ticket_fields } = await this.client.request<any, ITicketFieldResponse>({
+        const { ticket_fields } = await this.client.request<ITicketFieldResponse>({
             url: `/api/v2/ticket_fields`,
             type: "GET",
             contentType: "application/json"
@@ -133,7 +141,9 @@ export class ZendeskApiService {
      * Gets a user using the zendesk api
      */
     public async getUser<T>(userId: number): Promise<IZendeskUser<T>> {
-        const result = await this.client.request<string, { user: IZendeskUser<T> }>(`/api/v2/users/${userId}`);
+        const result = await this.client.request<{ user: IZendeskUser<T> }>({
+            url: `/api/v2/users/${userId}`
+        });
 
         return result.user;
     }
@@ -275,7 +285,9 @@ export class ZendeskApiService {
      * Fetch all user instance locales
      */
     public async getLocales(): Promise<IZendeskLocale[]> {
-        const results = await this.client.request<string, ILocalesResults>(`/api/v2/locales`);
+        const results = await this.client.request<ILocalesResults>({
+            url: `/api/v2/locales`
+        });
 
         return results.locales;
     }
@@ -308,9 +320,9 @@ export class ZendeskApiService {
      * @returns {Promise<IZisIntegration[]>} List of Zis integrations
      */
     public async fetchZisIntegrations(): Promise<IZisIntegration[]> {
-        const { integrations } = await this.client.request<unknown, IZisIntegrationResponse>({
+        const { integrations } = await this.client.request<IZisIntegrationResponse>({
             url: `/api/services/zis/registry/integrations`,
-            method: "GET",
+            type: "GET",
             contentType: "application/json"
         });
 
@@ -325,9 +337,9 @@ export class ZendeskApiService {
      * @returns {Promise<IZisIntegration>} List of Zis integrations
      */
     public async createZisIntegration(name: string, description: string): Promise<IZisIntegration> {
-        return await this.client.request<unknown, IZisIntegration>({
+        return await this.client.request<IZisIntegration>({
             url: `/api/services/zis/registry/${name}`,
-            method: "POST",
+            type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
                 description
@@ -352,7 +364,7 @@ export class ZendeskApiService {
         };
 
         do {
-            const response = await this.client.request<unknown, IZisJobspecsResponse>({
+            const response = await this.client.request<IZisJobspecsResponse>({
                 url: `/api/services/zis/registry/${integrationName}/job_specs`,
                 type: "GET",
                 data
@@ -491,7 +503,7 @@ export class ZendeskApiService {
     public async uploadZisBundle(integrationName: string, bundle: unknown): Promise<void> {
         return await this.client.request({
             url: `/api/services/zis/registry/${integrationName}/bundles`,
-            method: "POST",
+            type: "POST",
             contentType: "application/json",
             data: JSON.stringify(bundle)
         });

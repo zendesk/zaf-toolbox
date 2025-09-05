@@ -48,7 +48,9 @@ describe("SunshineConversationApiService", () => {
         metadata: jest.fn(),
         context: jest.fn(),
         trigger: jest.fn(),
-        instance: jest.fn()
+        instance: jest.fn(),
+        has: jest.fn(),
+        off: jest.fn()
     };
     const sunshineConversationApiService = new SunshineConversationApiService(appSettings, client);
 

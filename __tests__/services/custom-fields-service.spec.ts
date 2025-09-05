@@ -1,6 +1,6 @@
 import { MissingCustomFields } from "@errors/missing-custom-fields";
 import { CustomFieldsService, ZendeskApiService } from "@services/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 const mockClient = {
     request: jest.fn(),
@@ -16,7 +16,7 @@ describe("CustomFieldsService", () => {
         const defaultIdentifiers: string[] = ["TicketFieldOrderCreatedAt"];
         const service = (fetchFromApi = true, identifiers: string[] = defaultIdentifiers): CustomFieldsService => {
             return new CustomFieldsService(
-                mockClient as unknown as Client,
+                mockClient as unknown as IClient,
                 ZendeskApiServiceMock as unknown as ZendeskApiService,
                 identifiers,
                 fetchFromApi

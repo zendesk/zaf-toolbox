@@ -20,18 +20,18 @@ import {
     IUpdateCustomObjectFieldAutonumberingPropertiesBody,
     IUpdateCustomObjectFieldBody
 } from "@models/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 const CONTENT_TYPE = "application/json";
 
 export class CustomObjectService {
-    constructor(private readonly client: Client) {}
+    constructor(private readonly client: IClient) {}
 
     /**
      * Create a custom object in the Zendesk instance
      */
     public async createCustomObject(body: ICreateCustomObjectRequestBody): Promise<ICustomObjectResponse> {
-        return this.client.request<any, ICustomObjectResponse>({
+        return this.client.request<ICustomObjectResponse>({
             url: `/api/v2/custom_objects`,
             type: "POST",
             contentType: CONTENT_TYPE,
@@ -45,7 +45,7 @@ export class CustomObjectService {
      * List all custom object created in Zendesk instance
      */
     public async listCustomObjects(): Promise<IListCustomObjectsResponse> {
-        return this.client.request<any, IListCustomObjectsResponse>({
+        return this.client.request<IListCustomObjectsResponse>({
             url: `/api/v2/custom_objects`,
             type: "GET",
             contentType: CONTENT_TYPE
@@ -57,7 +57,7 @@ export class CustomObjectService {
      */
     public async getCustomObject(key: string): Promise<ICustomObjectResponse | undefined> {
         try {
-            return await this.client.request<any, ICustomObjectResponse>({
+            return await this.client.request<ICustomObjectResponse>({
                 url: `/api/v2/custom_objects/${key}`,
                 type: "GET",
                 contentType: CONTENT_TYPE
@@ -71,7 +71,7 @@ export class CustomObjectService {
      * Delete one custom object created in Zendesk Instance
      */
     public async deleteCustomObject(key: string): Promise<void> {
-        return this.client.request<any, void>({
+        return this.client.request<void>({
             url: `/api/v2/custom_objects/${key}`,
             type: "DELETE",
             contentType: CONTENT_TYPE
@@ -85,7 +85,7 @@ export class CustomObjectService {
         key: string,
         include_standard_fields = false
     ): Promise<IListCustomObjectFieldsResponse> {
-        return this.client.request<any, IListCustomObjectFieldsResponse>({
+        return this.client.request<IListCustomObjectFieldsResponse>({
             url: `/api/v2/custom_objects/${key}/fields`,
             type: "GET",
             contentType: CONTENT_TYPE,
@@ -102,7 +102,7 @@ export class CustomObjectService {
         key: string,
         body: ICreateCustomObjectFieldRequestBody
     ): Promise<ICustomObjectFieldResponse> {
-        return this.client.request<any, ICustomObjectFieldResponse>({
+        return this.client.request<ICustomObjectFieldResponse>({
             url: `/api/v2/custom_objects/${key}/fields`,
             type: "POST",
             contentType: CONTENT_TYPE,
@@ -126,7 +126,7 @@ export class CustomObjectService {
         fieldKeyOrId: string,
         body: IUpdateCustomObjectFieldAutonumberingPropertiesBody | IUpdateCustomObjectFieldBody
     ): Promise<ICustomObjectFieldResponse> {
-        return this.client.request<any, ICustomObjectFieldResponse>({
+        return this.client.request<ICustomObjectFieldResponse>({
             url: `/api/v2/custom_objects/${key}/fields/${fieldKeyOrId}`,
             type: "PATCH",
             contentType: CONTENT_TYPE,
@@ -140,7 +140,7 @@ export class CustomObjectService {
      * Delete a custom object field and associate to a custom object
      */
     public async deleteCustomObjectField(customObjectKey: string, fieldKey: string): Promise<void> {
-        return this.client.request<any, void>({
+        return this.client.request<void>({
             url: `/api/v2/custom_objects/${customObjectKey}/fields/${fieldKey}`,
             type: "DELETE",
             contentType: CONTENT_TYPE
@@ -154,7 +154,7 @@ export class CustomObjectService {
         key: string,
         data?: IListFilter
     ): Promise<ICustomObjectRecord<T>[]> {
-        const { custom_object_records } = await this.client.request<any, IListCustomObjectRecordsResponse<T>>({
+        const { custom_object_records } = await this.client.request<IListCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records`,
             type: "GET",
             contentType: CONTENT_TYPE,
@@ -183,7 +183,7 @@ export class CustomObjectService {
         key: string,
         id: string
     ): Promise<ICustomObjectRecord<T>> {
-        const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
+        const { custom_object_record } = await this.client.request<IGetCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records/${id}`,
             type: "GET",
             contentType: CONTENT_TYPE
@@ -199,7 +199,7 @@ export class CustomObjectService {
         key: string,
         body: ICreateCustomObjectRecordBody<T>
     ): Promise<ICustomObjectRecord<T>> {
-        const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
+        const { custom_object_record } = await this.client.request<IGetCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records`,
             type: "POST",
             contentType: CONTENT_TYPE,
@@ -219,7 +219,7 @@ export class CustomObjectService {
         id: string,
         body: ICreateCustomObjectRecordBody<T>
     ): Promise<ICustomObjectRecord<T>> {
-        const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
+        const { custom_object_record } = await this.client.request<IGetCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records/${id}`,
             type: "PATCH",
             contentType: CONTENT_TYPE,
@@ -243,7 +243,7 @@ export class CustomObjectService {
         body: ISetCustomObjectRecordFieldBody<T>,
         externalId: string
     ): Promise<ICustomObjectRecord<T>> {
-        const { custom_object_record } = await this.client.request<any, IGetCustomObjectRecordsResponse<T>>({
+        const { custom_object_record } = await this.client.request<IGetCustomObjectRecordsResponse<T>>({
             url: `/api/v2/custom_objects/${key}/records?external_id=${externalId}`,
             type: "PATCH",
             contentType: CONTENT_TYPE,
@@ -263,7 +263,7 @@ export class CustomObjectService {
      * Delete custom object record for a custom objects
      */
     public async deleteCustomObjectRecord(key: string, id: string): Promise<void> {
-        return this.client.request<any, void>({
+        return this.client.request<void>({
             url: `/api/v2/custom_objects/${key}/records/${id}`,
             type: "DELETE",
             contentType: CONTENT_TYPE
@@ -346,7 +346,7 @@ export class CustomObjectService {
         if (fetchAllPages) {
             return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, filter, "POST");
         } else {
-            return this.client.request<any, IListCustomObjectRecordsResponse<T>>({
+            return this.client.request<IListCustomObjectRecordsResponse<T>>({
                 url: `/api/v2/custom_objects/${key}/records/search`,
                 type: "POST",
                 contentType: CONTENT_TYPE,
@@ -365,7 +365,7 @@ export class CustomObjectService {
      * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#custom-object-record-bulk-jobs
      */
     public async bulkJobsForRecords(key: string, job: IBulkJobBody): Promise<IBulkJobResponse> {
-        return this.client.request<any, IBulkJobResponse>({
+        return this.client.request<IBulkJobResponse>({
             url: `/api/v2/custom_objects/${key}/jobs`,
             type: "POST",
             contentType: CONTENT_TYPE,
@@ -410,7 +410,7 @@ export class CustomObjectService {
                 };
             }
 
-            const response = await this.client.request<any, IListCustomObjectRecordsResponse<T>>(options);
+            const response = await this.client.request<IListCustomObjectRecordsResponse<T>>(options);
 
             objects = [...objects, ...response.custom_object_records];
 

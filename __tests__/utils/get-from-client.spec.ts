@@ -1,5 +1,5 @@
 import { getFromClient } from "@utils/index";
-import { Client } from "@zendesk/sell-zaf-app-toolbox";
+import { IClient } from "@models/zaf-client";
 
 describe("Get From Client", () => {
     it("Should return the value from the client", async () => {
@@ -9,7 +9,7 @@ describe("Get From Client", () => {
             get: jest.fn().mockResolvedValue({ [path]: "some value" })
         };
 
-        const result = await getFromClient<string>(mockClient as unknown as Client, path);
+        const result = await getFromClient<string>(mockClient as unknown as IClient, path);
 
         expect(result).toBe("some value");
         expect(mockClient.get).toHaveBeenCalledWith(path);
@@ -23,7 +23,7 @@ describe("Get From Client", () => {
             get: jest.fn().mockResolvedValue({ [path]: "some value", [path2]: "some value 2" })
         };
 
-        const result = await getFromClient<string>(mockClient as unknown as Client, [path, path2]);
+        const result = await getFromClient<string>(mockClient as unknown as IClient, [path, path2]);
 
         expect(result).toStrictEqual({
             path: "some value",
