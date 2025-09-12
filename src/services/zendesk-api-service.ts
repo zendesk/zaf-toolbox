@@ -29,7 +29,8 @@ import {
     IListFilter,
     ICreateAccessTokenResponse,
     IZendeskTicket,
-    IBulkJobResponse
+    IBulkJobResponse,
+    ITicketsResults
 } from "@models/index";
 import {
     ICreateConnectionResponse,
@@ -97,6 +98,24 @@ export class ZendeskApiService {
         } catch {
             throw new NotFoundError(requirementIdentifier);
         }
+    }
+
+    /**
+     * Retrieve multiple zendesk tickets
+     * A limit of 100 tickets can be retrieved at a time.
+     */
+    public async getZendeskTickets(ticketIds: number[]): Promise<IZendeskTicket[]> {
+        if (ticketIds.length > 100) {
+            throw new Error("A limit of 100 tickets can be retrieved at a time.");
+        }
+
+        const { tickets } = await this.client.request<ITicketsResults>({
+            url: `/api/v2/tickets/show_many?id=${ticketIds.join(",")}`,
+            type: "GET",
+            contentType: "application/json"
+        });
+
+        return tickets;
     }
 
     /**
