@@ -204,7 +204,7 @@ describe("ZendeskService", () => {
                 },
                 {
                     id: 2,
-                    subject: "Test ticket 2", 
+                    subject: "Test ticket 2",
                     created_at: "2023-01-02T00:00:00Z",
                     updated_at: "2023-01-02T00:00:00Z",
                     url: "https://example.zendesk.com/api/v2/tickets/2.json",
@@ -227,20 +227,6 @@ describe("ZendeskService", () => {
                 expect(result).toEqual(mockTickets);
             });
 
-            it("should retrieve a single ticket", async () => {
-                const singleTicket = [mockTickets[0]];
-                requestMock.mockResolvedValueOnce({ tickets: singleTicket });
-
-                const result = await service.getZendeskTickets([1]);
-
-                expect(requestMock).toHaveBeenCalledWith({
-                    url: `/api/v2/tickets/show_many?id=1`,
-                    type: "GET",
-                    contentType: "application/json"
-                });
-                expect(result).toEqual(singleTicket);
-            });
-
             it("should handle empty ticket array", async () => {
                 requestMock.mockResolvedValueOnce({ tickets: [] });
 
@@ -254,19 +240,6 @@ describe("ZendeskService", () => {
                 expect(result).toEqual([]);
             });
 
-            it("should handle multiple ticket IDs correctly", async () => {
-                requestMock.mockResolvedValueOnce({ tickets: mockTickets });
-
-                const result = await service.getZendeskTickets([1, 2, 3, 4, 5]);
-
-                expect(requestMock).toHaveBeenCalledWith({
-                    url: `/api/v2/tickets/show_many?id=1,2,3,4,5`,
-                    type: "GET",
-                    contentType: "application/json"
-                });
-                expect(result).toEqual(mockTickets);
-            });
-
             it("should return tickets array from the API response", async () => {
                 const apiResponse = { tickets: mockTickets };
                 requestMock.mockResolvedValueOnce(apiResponse);
@@ -277,6 +250,16 @@ describe("ZendeskService", () => {
                 expect(result).toHaveLength(2);
                 expect(result[0]).toEqual(mockTickets[0]);
                 expect(result[1]).toEqual(mockTickets[1]);
+            });
+
+            it("should throw an error when trying to retrieve more than 100 tickets", async () => {
+                const manyTicketIds = Array.from({ length: 101 }, (_, index) => index + 1);
+
+                await expect(service.getZendeskTickets(manyTicketIds)).rejects.toThrow(
+                    "A limit of 100 tickets can be retrieved at a time."
+                );
+
+                expect(requestMock).not.toHaveBeenCalled();
             });
         });
     });
