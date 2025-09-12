@@ -4,6 +4,7 @@ import {
     HttpMethod,
     IContentText,
     IRequirement,
+    IZendeskTicket,
     IZendeskUser,
     IZendeskUserField,
     ZendeskUserFieldType
@@ -186,6 +187,96 @@ describe("ZendeskService", () => {
                         }
                     })
                 });
+            });
+        });
+
+        describe("getZendeskTickets", () => {
+            const mockTickets: IZendeskTicket[] = [
+                {
+                    id: 1,
+                    subject: "Test ticket 1",
+                    created_at: "2023-01-01T00:00:00Z",
+                    updated_at: "2023-01-01T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/1.json",
+                    is_public: true,
+                    status: "open",
+                    priority: "normal"
+                },
+                {
+                    id: 2,
+                    subject: "Test ticket 2", 
+                    created_at: "2023-01-02T00:00:00Z",
+                    updated_at: "2023-01-02T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/2.json",
+                    is_public: false,
+                    status: "pending",
+                    priority: "high"
+                }
+            ];
+
+            it("should retrieve multiple tickets with the correct API call", async () => {
+                requestMock.mockResolvedValueOnce({ tickets: mockTickets });
+
+                const result = await service.getZendeskTickets([1, 2]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?id=1,2`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should retrieve a single ticket", async () => {
+                const singleTicket = [mockTickets[0]];
+                requestMock.mockResolvedValueOnce({ tickets: singleTicket });
+
+                const result = await service.getZendeskTickets([1]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?id=1`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual(singleTicket);
+            });
+
+            it("should handle empty ticket array", async () => {
+                requestMock.mockResolvedValueOnce({ tickets: [] });
+
+                const result = await service.getZendeskTickets([999]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?id=999`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual([]);
+            });
+
+            it("should handle multiple ticket IDs correctly", async () => {
+                requestMock.mockResolvedValueOnce({ tickets: mockTickets });
+
+                const result = await service.getZendeskTickets([1, 2, 3, 4, 5]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?id=1,2,3,4,5`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should return tickets array from the API response", async () => {
+                const apiResponse = { tickets: mockTickets };
+                requestMock.mockResolvedValueOnce(apiResponse);
+
+                const result = await service.getZendeskTickets([1, 2]);
+
+                expect(result).toBe(apiResponse.tickets);
+                expect(result).toHaveLength(2);
+                expect(result[0]).toEqual(mockTickets[0]);
+                expect(result[1]).toEqual(mockTickets[1]);
             });
         });
     });

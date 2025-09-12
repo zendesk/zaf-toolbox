@@ -10,6 +10,10 @@ export interface IAssignee {
     user: IZendeskUser;
 }
 
+export interface ITicketsResults {
+    tickets: IZendeskTicket[];
+}
+
 export interface ITicketCustomField {
     id: string;
     value: string;

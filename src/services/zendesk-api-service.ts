@@ -29,7 +29,8 @@ import {
     IListFilter,
     ICreateAccessTokenResponse,
     IZendeskTicket,
-    IBulkJobResponse
+    IBulkJobResponse,
+    ITicketsResults
 } from "@models/index";
 import {
     ICreateConnectionResponse,
@@ -97,6 +98,19 @@ export class ZendeskApiService {
         } catch {
             throw new NotFoundError(requirementIdentifier);
         }
+    }
+
+    /**
+     * Retrieve multiple zendesk tickets
+     */
+    public async getZendeskTickets(ticketIds: number[]): Promise<IZendeskTicket[]> {
+        const { tickets } = await this.client.request<ITicketsResults>({
+            url: `/api/v2/tickets/show_many?id=${ticketIds.join(",")}`,
+            type: "GET",
+            contentType: "application/json"
+        });
+
+        return tickets;
     }
 
     /**
