@@ -110,7 +110,7 @@ export class ZendeskApiService {
         }
 
         const { tickets } = await this.client.request<ITicketsResults>({
-            url: `/api/v2/tickets/show_many?id=${ticketIds.join(",")}`,
+            url: `/api/v2/tickets/show_many?ids=${ticketIds.join(",")}`,
             type: "GET",
             contentType: "application/json"
         });

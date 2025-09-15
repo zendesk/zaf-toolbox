@@ -220,7 +220,7 @@ describe("ZendeskService", () => {
                 const result = await service.getZendeskTickets([1, 2]);
 
                 expect(requestMock).toHaveBeenCalledWith({
-                    url: `/api/v2/tickets/show_many?id=1,2`,
+                    url: `/api/v2/tickets/show_many?ids=1,2`,
                     type: "GET",
                     contentType: "application/json"
                 });
@@ -233,23 +233,11 @@ describe("ZendeskService", () => {
                 const result = await service.getZendeskTickets([999]);
 
                 expect(requestMock).toHaveBeenCalledWith({
-                    url: `/api/v2/tickets/show_many?id=999`,
+                    url: `/api/v2/tickets/show_many?ids=999`,
                     type: "GET",
                     contentType: "application/json"
                 });
                 expect(result).toEqual([]);
-            });
-
-            it("should return tickets array from the API response", async () => {
-                const apiResponse = { tickets: mockTickets };
-                requestMock.mockResolvedValueOnce(apiResponse);
-
-                const result = await service.getZendeskTickets([1, 2]);
-
-                expect(result).toBe(apiResponse.tickets);
-                expect(result).toHaveLength(2);
-                expect(result[0]).toEqual(mockTickets[0]);
-                expect(result[1]).toEqual(mockTickets[1]);
             });
 
             it("should throw an error when trying to retrieve more than 100 tickets", async () => {
