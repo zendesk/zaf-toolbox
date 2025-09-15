@@ -4,6 +4,7 @@ import {
     HttpMethod,
     IContentText,
     IRequirement,
+    IZendeskTicket,
     IZendeskUser,
     IZendeskUserField,
     ZendeskUserFieldType
@@ -186,6 +187,67 @@ describe("ZendeskService", () => {
                         }
                     })
                 });
+            });
+        });
+
+        describe("getZendeskTickets", () => {
+            const mockTickets: IZendeskTicket[] = [
+                {
+                    id: 1,
+                    subject: "Test ticket 1",
+                    created_at: "2023-01-01T00:00:00Z",
+                    updated_at: "2023-01-01T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/1.json",
+                    is_public: true,
+                    status: "open",
+                    priority: "normal"
+                },
+                {
+                    id: 2,
+                    subject: "Test ticket 2",
+                    created_at: "2023-01-02T00:00:00Z",
+                    updated_at: "2023-01-02T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/2.json",
+                    is_public: false,
+                    status: "pending",
+                    priority: "high"
+                }
+            ];
+
+            it("should retrieve multiple tickets with the correct API call", async () => {
+                requestMock.mockResolvedValueOnce({ tickets: mockTickets });
+
+                const result = await service.getZendeskTickets([1, 2]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?ids=1,2`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should handle empty ticket array", async () => {
+                requestMock.mockResolvedValueOnce({ tickets: [] });
+
+                const result = await service.getZendeskTickets([999]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/tickets/show_many?ids=999`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual([]);
+            });
+
+            it("should throw an error when trying to retrieve more than 100 tickets", async () => {
+                const manyTicketIds = Array.from({ length: 101 }, (_, index) => index + 1);
+
+                await expect(service.getZendeskTickets(manyTicketIds)).rejects.toThrow(
+                    "A limit of 100 tickets can be retrieved at a time."
+                );
+
+                expect(requestMock).not.toHaveBeenCalled();
             });
         });
     });
