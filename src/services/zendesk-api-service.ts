@@ -49,6 +49,11 @@ import { IClient } from "@models/zaf-client";
  */
 export const UPDATE_USER_FIELD_MAX_USERS = 90;
 
+/**
+ * Maximum number of tickets that can be retrieved at a time
+ */
+export const MAX_TICKETS_PER_REQUEST = 100;
+
 export class ZendeskApiService {
     public constructor(public client: IClient) {}
 
@@ -105,7 +110,7 @@ export class ZendeskApiService {
      * A limit of 100 tickets can be retrieved at a time.
      */
     public async getZendeskTickets(ticketIds: number[]): Promise<IZendeskTicket[]> {
-        if (ticketIds.length > 100) {
+        if (ticketIds.length > MAX_TICKETS_PER_REQUEST) {
             throw new Error("A limit of 100 tickets can be retrieved at a time.");
         }
 
@@ -294,7 +299,7 @@ export class ZendeskApiService {
     public async createManyTickets(
         tickets: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">[]
     ): Promise<IBulkJobResponse> {
-        if (tickets.length > 100) {
+        if (tickets.length > MAX_TICKETS_PER_REQUEST) {
             throw new Error("A limit of 100 tickets can be created at a time.");
         }
 
