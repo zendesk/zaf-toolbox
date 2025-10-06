@@ -278,7 +278,7 @@ export class ZendeskApiService {
     public async createTicket(
         body: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">
     ): Promise<IZendeskTicket> {
-        const { ticket } = await this.client.request<{
+        const res = await this.client.request<{
             ticket: IZendeskTicket;
         }>({
             url: "/api/v2/tickets",
@@ -289,7 +289,9 @@ export class ZendeskApiService {
             })
         });
 
-        return ticket;
+        console.log("DEBUG", res.ticket);
+
+        return res.ticket;
     }
 
     /**
