@@ -906,6 +906,16 @@ describe("ZendeskService", () => {
 
     describe("createTicket", () => {
         it("should create a ticket with the correct data", async () => {
+            requestMock.mockResolvedValueOnce({
+                ticket: {
+                    id: 123,
+                    created_at: "2023-01-01T00:00:00Z",
+                    updated_at: "2023-01-01T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/123.json",
+                    is_public: true
+                }
+            });
+
             await service.createTicket({
                 subject: "test",
                 requester_id: 123,
