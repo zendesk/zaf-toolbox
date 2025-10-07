@@ -276,16 +276,20 @@ export class ZendeskApiService {
      * @returns {IZendeskTicket}
      */
     public async createTicket(
-        ticket: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">
+        body: Omit<IZendeskTicket, "id" | "created_at" | "updated_at" | "url" | "is_public">
     ): Promise<IZendeskTicket> {
-        return await this.client.request<IZendeskTicket>({
+        const res = await this.client.request<{
+            ticket: IZendeskTicket;
+        }>({
             url: "/api/v2/tickets",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
-                ticket
+                ticket: body
             })
         });
+
+        return res.ticket;
     }
 
     /**
