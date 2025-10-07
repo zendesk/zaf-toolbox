@@ -289,8 +289,6 @@ export class ZendeskApiService {
             })
         });
 
-        console.log("DEBUG", res.ticket);
-
         return res.ticket;
     }
 
