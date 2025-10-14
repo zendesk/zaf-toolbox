@@ -35,6 +35,7 @@ import {
 import {
     ICreateConnectionResponse,
     ICreateInboundWebhookResponse,
+    ICreateZisBasicAuthConnection,
     IZisIntegration,
     IZisIntegrationResponse,
     IZisJobspec,
@@ -536,6 +537,36 @@ export class ZendeskApiService {
             data: JSON.stringify({
                 name: connection_name,
                 token,
+                allowed_domain
+            })
+        });
+    }
+
+    /**
+     * Creates a ZIS connection for the given integration.
+     *
+     * @param {string} integration_name - The name of the ZIS integration.
+     * @param {string} username - The username for the connection.
+     * @param {string} password - The password for the connection.
+     * @param {string} connection_name - The name of the connection.
+     * @param {string} allowed_domain - The allowed domain for the connection.
+     * @returns {Promise<ICreateZisBasicAuthConnection>} - The response from the API.
+     */
+    public async createZisBasicAuthConnection(
+        integration_name: string,
+        username: string,
+        password: string,
+        connection_name: string,
+        allowed_domain: string
+    ): Promise<ICreateZisBasicAuthConnection> {
+        return this.client.request({
+            url: `/api/services/zis/integrations/${integration_name}/connections/basic_auth`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                name: connection_name,
+                username,
+                password,
                 allowed_domain
             })
         });
