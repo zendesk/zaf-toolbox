@@ -46,6 +46,17 @@ export interface ICreateConnectionResponse {
     bearer_token: IBearerTokenResponse;
 }
 
+export interface ICreateZisBasicAuthConnection {
+    basic_auth: {
+        allowed_domain: string;
+        created_at: string;
+        name: string;
+        password: string;
+        updated_at: string;
+        username: string;
+    };
+}
+
 export interface ICreateInboundWebhookResponse {
     id: string;
     uuid: string;

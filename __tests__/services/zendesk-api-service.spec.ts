@@ -847,9 +847,9 @@ describe("ZendeskService", () => {
         });
     });
 
-    describe("createZisConnection", () => {
+    describe("createZisBearerTokenConnection", () => {
         it("should create an access token with the correct data", async () => {
-            await service.createZisConnection("integrationName", "token", "connectionName", "zendesk.com");
+            await service.createZisBearerTokenConnection("integrationName", "token", "connectionName", "zendesk.com");
 
             expect(requestMock).toHaveBeenNthCalledWith(1, {
                 url: "/api/services/zis/integrations/integrationName/connections/bearer_token",
