@@ -521,7 +521,7 @@ export class ZendeskApiService {
      * @param {string} allowed_domain - The allowed domain for the connection.
      * @returns {Promise<ICreateConnectionResponse>} - The response from the API.
      */
-    public async createZisConnection(
+    public async createZisBearerTokenConnection(
         integration_name: string,
         token: string,
         connection_name: string,
