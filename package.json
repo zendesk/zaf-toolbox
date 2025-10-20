@@ -40,7 +40,7 @@
         "react": "^16.14.0"
     },
     "devDependencies": {
-        "@eslint/js": "^9.34.0",
+        "@eslint/js": "^9.38.0",
         "@testing-library/jest-dom": "^6.9.1",
         "@types/gulp": "^4.0.17",
         "@types/jest": "^30.0.0",
