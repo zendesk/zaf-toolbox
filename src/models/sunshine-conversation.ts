@@ -45,7 +45,8 @@ export enum Capabilities {
     Form = "form",
     FormResponse = "formResponse",
     List = "list",
-    Compound = "compound"
+    Compound = "compound",
+    Buy = "buy"
 }
 
 export type IContent = IContentCarousel | IContentImage | IContentText | IContentTemplate;
@@ -81,7 +82,7 @@ interface IBuyAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "buy";
+    type: Capabilities.Buy;
     /**
      * The amount being charged.
      * It needs to be specified in cents and is an integer (9.99$ -> 999).
@@ -97,7 +98,7 @@ interface ILinkAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "link";
+    type: Capabilities.Link;
     /**
      * The action URI. This is the link that will be used in the clients when clicking the button.
      */
@@ -135,14 +136,14 @@ interface ILocationRequestAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "locationRequest";
+    type: Capabilities.LocationRequest;
 }
 
 interface IPostbackAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "postback";
+    type: Capabilities.Postback;
     /**
      * The payload of a postback or reply button.
      */
@@ -153,7 +154,7 @@ interface IReplyAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "reply";
+    type: Capabilities.Reply;
     /**
      * A string payload to help you identify the action context.
      * Used when posting the reply. You can also use metadata for more complex needs.
@@ -169,7 +170,7 @@ interface IWebviewAction extends IBaseAction {
     /**
      * The type of action
      */
-    type: "webview";
+    type: Capabilities.Extension;
     /**
      * The action URI. This is the link that will be used in the clients when clicking the button.
      */

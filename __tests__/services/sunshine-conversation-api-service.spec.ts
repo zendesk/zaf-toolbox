@@ -159,7 +159,7 @@ describe("SunshineConversationApiService", () => {
                 text: `Your cart contains ${quantity} items for a total of ${price}`,
                 actions: [
                     {
-                        type: "link",
+                        type: Capabilities.Link,
                         uri: invoiceUrl,
                         text: "Complete your purchase"
                     }
