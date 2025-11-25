@@ -977,4 +977,62 @@ describe("ZendeskService", () => {
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("getActiveViews", () => {
+        const viewSample = {
+            active: true,
+            conditions: {
+                group_id: 1
+            },
+            created_at: "2023-01-01T00:00:00Z",
+            default: false,
+            description: "Test View",
+            execution: {
+                group_by: "group_by",
+                sort_by: "sort_by",
+                group_order: "asc",
+                sort_order: "asc"
+            }
+        };
+
+        it("should fetch active views with the correct data", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.getActiveViews();
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/active`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+    });
+
+    describe("getViews", () => {
+        const viewSample = {
+            active: true,
+            conditions: {
+                group_id: 1
+            },
+            created_at: "2023-01-01T00:00:00Z",
+            default: false,
+            description: "Test View",
+            execution: {
+                group_by: "group_by",
+                sort_by: "sort_by",
+                group_order: "asc",
+                sort_order: "asc"
+            }
+        };
+
+        it("should fetch views with the correct data", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.getViews();
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+    });
 });

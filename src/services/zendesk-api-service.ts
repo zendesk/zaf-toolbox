@@ -30,8 +30,11 @@ import {
     ICreateAccessTokenResponse,
     IZendeskTicket,
     IBulkJobResponse,
-    ITicketsResults
+    ITicketsResults,
+    IZendeskView,
+    IViewsResponse
 } from "@models/index";
+import { buildUrlParams } from "@utils/build-url-params";
 import {
     ICreateConnectionResponse,
     ICreateInboundWebhookResponse,
@@ -614,5 +617,73 @@ export class ZendeskApiService {
             contentType: "application/json",
             data: JSON.stringify(bundle)
         });
+    }
+
+    /**
+     * VIEWS SECTION
+     */
+
+    /**
+     * Fetch views with optional filters
+     *
+     * @param options Query parameters for filtering views
+     * @param options.access Only views with given access. May be "personal", "shared", or "account"
+     * @param options.active Only active views if true, inactive views if false
+     * @param options.group_id Only views belonging to given group
+     * @param options.sort The sort parameter used with cursor pagination. Defaults to "created_at". Prefix with '-' for descending order
+     * @param options.sort_by The sort_by parameter used with offset pagination. Possible values are "alphabetical", "created_at", or "updated_at". Defaults to "position"
+     * @param options.sort_order The sort_order parameter used with offset pagination. One of "asc" or "desc". Defaults to "asc" for alphabetical and position sort, "desc" for all others
+     * @param fetchAllViews Whether to fetch all pages or just the first. Defaults to true
+     * @returns Promise resolving to array of views
+     */
+    public async getViews(
+        options?: {
+            access?: "personal" | "shared" | "account";
+            active?: boolean;
+            group_id?: number;
+            sort?: string;
+            sort_by?: "alphabetical" | "created_at" | "updated_at";
+            sort_order?: "asc" | "desc";
+        },
+        fetchAllViews = true
+    ): Promise<IZendeskView[]> {
+        const queryParams = options ? buildUrlParams(options) : "";
+        const url = `/api/v2/views${queryParams ? `?${queryParams}` : ""}`;
+
+        return this.fetchAllPaginatedResults<IViewsResponse, IZendeskView>(
+            url,
+            fetchAllViews,
+            (response) => response.views
+        );
+    }
+
+    /**
+     * Fetch active views with optional filters
+     *
+     * @param options Query parameters for filtering active views
+     * @param options.access Only views with given access. May be "personal", "shared", or "account"
+     * @param options.group_id Only views belonging to given group
+     * @param options.sort_by Possible values are "alphabetical", "created_at", or "updated_at". Defaults to "position"
+     * @param options.sort_order One of "asc" or "desc". Defaults to "asc" for alphabetical and position sort, "desc" for all others
+     * @param fetchAllViews Whether to fetch all pages or just the first. Defaults to true
+     * @returns Promise resolving to array of active views
+     */
+    public async getActiveViews(
+        options?: {
+            access?: "personal" | "shared" | "account";
+            group_id?: number;
+            sort_by?: "alphabetical" | "created_at" | "updated_at";
+            sort_order?: "asc" | "desc";
+        },
+        fetchAllViews = true
+    ): Promise<IZendeskView[]> {
+        const queryParams = options ? buildUrlParams(options) : "";
+        const url = `/api/v2/views/active${queryParams ? `?${queryParams}` : ""}`;
+
+        return this.fetchAllPaginatedResults<IViewsResponse, IZendeskView>(
+            url,
+            fetchAllViews,
+            (response) => response.views
+        );
     }
 }
