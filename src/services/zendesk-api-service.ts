@@ -686,4 +686,41 @@ export class ZendeskApiService {
             (response) => response.views
         );
     }
+
+    /**
+     * Search views by query string with optional filters
+     *
+     * @param query Query string used to find all views with matching title
+     * @param options Query parameters for filtering search results
+     * @param options.access Filter views by access. May be "personal", "shared", or "account"
+     * @param options.active Filter by active views if true or inactive views if false
+     * @param options.group_id Filter views by group
+     * @param options.include A sideload to include in the response
+     * @param options.sort_by Possible values are "alphabetical", "created_at", "updated_at", and "position". If unspecified, views are sorted by relevance
+     * @param options.sort_order One of "asc" or "desc". Defaults to "asc" for alphabetical and position sort, "desc" for all others
+     * @param fetchAllViews Whether to fetch all pages or just the first. Defaults to true
+     * @returns Promise resolving to array of views matching the search query
+     */
+    public async searchViews(
+        query: string,
+        options?: {
+            access?: "personal" | "shared" | "account";
+            active?: boolean;
+            group_id?: number;
+            include?: string;
+            sort_by?: "alphabetical" | "created_at" | "updated_at" | "position";
+            sort_order?: "asc" | "desc";
+        },
+        fetchAllViews = true
+    ): Promise<IZendeskView[]> {
+        const params = { query, ...options };
+        const queryParams = buildUrlParams(params);
+        const url = `/api/v2/views/search?${queryParams}`;
+
+        return this.fetchAllPaginatedResults<IViewsResponse, IZendeskView>(
+            url,
+            fetchAllViews,
+            (response) => response.views
+        );
+    }
 }

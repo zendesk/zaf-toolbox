@@ -1035,4 +1035,136 @@ describe("ZendeskService", () => {
             expect(result).toEqual([viewSample]);
         });
     });
+
+    describe("searchViews", () => {
+        const viewSample = {
+            active: true,
+            conditions: {},
+            created_at: "2023-01-01T00:00:00Z",
+            default: false,
+            description: "View for recent tickets",
+            execution: {},
+            id: 25,
+            position: 3,
+            restriction: {},
+            title: "Tickets updated less than 12 Hours",
+            updated_at: "2023-01-01T00:00:00Z"
+        };
+
+        const inactiveViewSample = {
+            active: false,
+            conditions: {},
+            created_at: "2023-01-01T00:00:00Z",
+            default: false,
+            description: "View for tickets that are not assigned",
+            execution: {},
+            id: 23,
+            position: 7,
+            restriction: {},
+            title: "Unassigned tickets",
+            updated_at: "2023-01-01T00:00:00Z"
+        };
+
+        it("should search views with query string", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.searchViews("tickets");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+
+        it("should search views with query string and access filter", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.searchViews("tickets", { access: "shared" });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets&access=shared`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+
+        it("should search views with query string and active filter", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.searchViews("tickets", { active: true });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets&active=true`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+
+        it("should search views with query string and group_id filter", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.searchViews("tickets", { group_id: 123 });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets&group_id=123`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+
+        it("should search views with query string and sort parameters", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample] });
+
+            const result = await service.searchViews("tickets", { sort_by: "alphabetical", sort_order: "asc" });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets&sort_by=alphabetical&sort_order=asc`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+
+        it("should search views with all options", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample, inactiveViewSample] });
+
+            const result = await service.searchViews("tickets", {
+                access: "personal",
+                active: false,
+                group_id: 456,
+                include: "sideload",
+                sort_by: "updated_at",
+                sort_order: "desc"
+            });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets&access=personal&active=false&group_id=456&include=sideload&sort_by=updated_at&sort_order=desc`
+            });
+            expect(result).toEqual([viewSample, inactiveViewSample]);
+        });
+
+        it("should continue calling the API until next_page disappears", async () => {
+            requestMock
+                .mockResolvedValueOnce({ views: [viewSample], next_page: "next_page" })
+                .mockResolvedValueOnce({ views: [inactiveViewSample] });
+
+            const result = await service.searchViews("tickets");
+
+            expect(requestMock).toHaveBeenCalledTimes(2);
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/views/search?query=tickets`
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: "next_page"
+            });
+            expect(result).toEqual([viewSample, inactiveViewSample]);
+        });
+
+        it("should only call the API one time when fetchAllViews is false", async () => {
+            requestMock.mockResolvedValueOnce({ views: [viewSample], next_page: "next_page" });
+
+            const result = await service.searchViews("tickets", undefined, false);
+
+            expect(requestMock).toHaveBeenCalledTimes(1);
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/views/search?query=tickets`
+            });
+            expect(result).toEqual([viewSample]);
+        });
+    });
 });
