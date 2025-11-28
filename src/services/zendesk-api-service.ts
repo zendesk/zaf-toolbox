@@ -34,7 +34,8 @@ import {
     IZendeskView,
     IViewsResponse,
     IZendeskBrand,
-    IBrandsResponse
+    IBrandsResponse,
+    ISearchResponse
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import {
@@ -109,6 +110,37 @@ export class ZendeskApiService {
         } catch {
             throw new NotFoundError(requirementIdentifier);
         }
+    }
+
+    /**
+     * Search only for tickets
+     *
+     * @param query The search query string
+     * @param options Query parameters for the search
+     * @param options.sort_by One of updated_at, created_at, priority, status, or ticket_type. Defaults to relevance
+     * @param options.sort_order One of asc or desc. Defaults to desc
+     * @param fetchAllResults Whether to fetch all pages or just the first. Defaults to true
+     * @returns Promise resolving to array of tickets matching the search query
+     */
+    public async searchTickets(
+        query: string,
+        options?: {
+            sort_by?: "updated_at" | "created_at" | "priority" | "status" | "ticket_type";
+            sort_order?: "asc" | "desc";
+        },
+        fetchAllResults = true
+    ): Promise<IZendeskTicket[]> {
+        const searchQuery = `type:ticket ${query}`;
+
+        const params = { query: searchQuery, ...options };
+        const queryParams = buildUrlParams(params);
+        const url = `/api/v2/search?${queryParams}`;
+
+        return this.fetchAllPaginatedResults<ISearchResponse<IZendeskTicket>, IZendeskTicket>(
+            url,
+            fetchAllResults,
+            (response: ISearchResponse<IZendeskTicket>) => response.results
+        );
     }
 
     /**

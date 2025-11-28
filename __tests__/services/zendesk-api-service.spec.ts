@@ -250,6 +250,109 @@ describe("ZendeskService", () => {
                 expect(requestMock).not.toHaveBeenCalled();
             });
         });
+
+        describe("searchTickets", () => {
+            const mockTickets: IZendeskTicket[] = [
+                {
+                    id: 1,
+                    subject: "Test ticket 1",
+                    created_at: "2023-01-01T00:00:00Z",
+                    updated_at: "2023-01-01T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/1.json",
+                    is_public: true,
+                    status: "open",
+                    priority: "normal"
+                },
+                {
+                    id: 2,
+                    subject: "Test ticket 2",
+                    created_at: "2023-01-02T00:00:00Z",
+                    updated_at: "2023-01-02T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/tickets/2.json",
+                    is_public: false,
+                    status: "pending",
+                    priority: "high"
+                }
+            ];
+
+            it("should search tickets with query string", async () => {
+                requestMock.mockResolvedValueOnce({ results: mockTickets });
+
+                const result = await service.searchTickets("status:open");
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/search?query=type%3Aticket%20status%3Aopen`
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should search tickets with query string and sort_order option", async () => {
+                requestMock.mockResolvedValueOnce({ results: mockTickets });
+
+                const result = await service.searchTickets("status:open", { sort_order: "desc" });
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/search?query=type%3Aticket%20status%3Aopen&sort_order=desc`
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should search tickets with both sort_by and sort_order options", async () => {
+                requestMock.mockResolvedValueOnce({ results: mockTickets });
+
+                const result = await service.searchTickets("status:open", {
+                    sort_by: "priority",
+                    sort_order: "asc"
+                });
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/search?query=type%3Aticket%20status%3Aopen&sort_by=priority&sort_order=asc`
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should continue calling the API until next_page disappears", async () => {
+                const firstTicket = mockTickets[0];
+                const secondTicket = mockTickets[1];
+
+                requestMock
+                    .mockResolvedValueOnce({ results: [firstTicket], next_page: "next_page" })
+                    .mockResolvedValueOnce({ results: [secondTicket] });
+
+                const result = await service.searchTickets("status:open");
+
+                expect(requestMock).toHaveBeenCalledTimes(2);
+                expect(requestMock).toHaveBeenNthCalledWith(1, {
+                    url: `/api/v2/search?query=type%3Aticket%20status%3Aopen`
+                });
+                expect(requestMock).toHaveBeenNthCalledWith(2, {
+                    url: "next_page"
+                });
+                expect(result).toEqual(mockTickets);
+            });
+
+            it("should only call the API one time when fetchAllResults is false", async () => {
+                requestMock.mockResolvedValueOnce({ results: [mockTickets[0]], next_page: "next_page" });
+
+                const result = await service.searchTickets("status:open", undefined, false);
+
+                expect(requestMock).toHaveBeenCalledTimes(1);
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/search?query=type%3Aticket%20status%3Aopen`
+                });
+                expect(result).toEqual([mockTickets[0]]);
+            });
+
+            it("should prepend type:ticket to the query", async () => {
+                requestMock.mockResolvedValueOnce({ results: mockTickets });
+
+                await service.searchTickets("assignee:me");
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/search?query=type%3Aticket%20assignee%3Ame`
+                });
+            });
+        });
     });
 
     describe("User", () => {

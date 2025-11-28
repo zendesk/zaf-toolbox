@@ -172,3 +172,24 @@ export interface ICreateAccessTokenResponseToken {
 export interface ICreateAccessTokenResponse {
     token: ICreateAccessTokenResponseToken;
 }
+
+/**
+ * Base interface for search result items
+ */
+export interface ISearchResultItem {
+    id: number;
+    name?: string;
+    created_at: string;
+    updated_at: string;
+    url: string;
+    result_type: string;
+    [key: string]: unknown;
+}
+
+/**
+ * Search response interface
+ */
+export interface ISearchResponse<T = ISearchResultItem> extends IZendeskResponse {
+    results: T[];
+    facets: unknown;
+}
