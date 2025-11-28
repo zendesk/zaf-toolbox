@@ -1167,4 +1167,51 @@ describe("ZendeskService", () => {
             expect(result).toEqual([viewSample]);
         });
     });
+
+    describe("getBrands", () => {
+        const brandSample = {
+            active: true,
+            brand_url: "https://example.zendesk.com/api/v2/brands/123.json",
+            created_at: "2023-01-01T00:00:00Z",
+            default: false,
+            has_help_center: true,
+            help_center_state: "enabled"
+        };
+
+        it("should fetch brands with the correct data", async () => {
+            requestMock.mockResolvedValueOnce({ brands: [brandSample] });
+
+            const result = await service.getBrands();
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/brands`
+            });
+            expect(result).toEqual([brandSample]);
+        });
+
+        it("should continue calling the API until next_page disappears", async () => {
+            requestMock
+                .mockResolvedValueOnce({ brands: [brandSample], next_page: "next_page" })
+                .mockResolvedValueOnce({ brands: [] });
+
+            const result = await service.getBrands();
+
+            expect(requestMock).toHaveBeenCalledTimes(2);
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/brands`
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: "next_page"
+            });
+            expect(result).toEqual([brandSample]);
+        });
+
+        it("should only call the API one time with fetchAllBrands set to false", async () => {
+            requestMock.mockResolvedValueOnce({ brands: [brandSample], next_page: "next_page" });
+
+            await service.getBrands(false);
+
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
 });
