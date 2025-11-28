@@ -32,7 +32,9 @@ import {
     IBulkJobResponse,
     ITicketsResults,
     IZendeskView,
-    IViewsResponse
+    IViewsResponse,
+    IZendeskBrand,
+    IBrandsResponse
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import {
@@ -721,6 +723,24 @@ export class ZendeskApiService {
             url,
             fetchAllViews,
             (response) => response.views
+        );
+    }
+
+    /**
+     * BRANDS SECTION
+     */
+
+    /**
+     * Fetch all brands
+     *
+     * @param fetchAllBrands Whether to fetch all pages or just the first. Defaults to true
+     * @returns Promise resolving to array of brands
+     */
+    public async getBrands(fetchAllBrands = true): Promise<IZendeskBrand[]> {
+        return this.fetchAllPaginatedResults<IBrandsResponse, IZendeskBrand>(
+            "/api/v2/brands",
+            fetchAllBrands,
+            (response) => response.brands
         );
     }
 }
