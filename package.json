@@ -36,7 +36,7 @@
         "@errors": "lib/errors"
     },
     "dependencies": {
-        "@zendeskgarden/react-theming": "^8.76.9",
+        "@zendeskgarden/react-theming": "^9.12.4",
         "react": "^16.14.0"
     },
     "devDependencies": {
