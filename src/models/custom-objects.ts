@@ -275,16 +275,18 @@ export interface IBulkJobBodyUpdate extends IBulkJobBodyBase<IUpdateCustomObject
     };
 }
 
-export interface IBulkJobBodyCreateOrUpdateByName
-    extends IBulkJobBodyBase<ICreateCustomObjectRecordBody<ICustomObjectRecordField>> {
+export interface IBulkJobBodyCreateOrUpdateByName extends IBulkJobBodyBase<
+    ICreateCustomObjectRecordBody<ICustomObjectRecordField>
+> {
     job: {
         action: RecordBulkAction.create_or_update_by_name;
         items: ICreateCustomObjectRecordBody<ICustomObjectRecordField>[];
     };
 }
 
-export interface IBulkJobBodyCreateOrUpdateByExternalId
-    extends IBulkJobBodyBase<ICreateCustomObjectRecordBodyWithExternalId<ICustomObjectRecordField>> {
+export interface IBulkJobBodyCreateOrUpdateByExternalId extends IBulkJobBodyBase<
+    ICreateCustomObjectRecordBodyWithExternalId<ICustomObjectRecordField>
+> {
     job: {
         action: RecordBulkAction.create_or_update_by_external_id;
         items: ICreateCustomObjectRecordBodyWithExternalId<ICustomObjectRecordField>[];
