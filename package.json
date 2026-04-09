@@ -44,7 +44,7 @@
         "@testing-library/jest-dom": "^6.9.1",
         "@types/gulp": "^4.0.18",
         "@types/jest": "^30.0.0",
-        "@types/lodash": "^4.17.20",
+        "@types/lodash": "^4.17.21",
         "@types/node": "^24.9.1",
         "@types/styled-components": "^5.1.36",
         "@typescript-eslint/parser": "^8.49.0",
