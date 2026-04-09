@@ -181,6 +181,24 @@ export class ZendeskApiService {
     }
 
     /**
+     * Retrieve multiple zendesk users
+     * A limit of 100 users can be retrieved at a time.
+     */
+    public async getUsersByIds<T = IZendeskUserFieldValue>(userIds: number[]): Promise<IZendeskUser<T>[]> {
+        if (userIds.length > MAX_TICKETS_PER_REQUEST) {
+            throw new Error("A limit of 100 users can be retrieved at a time.");
+        }
+
+        const { users } = await this.client.request<ISearchUserResults<T>>({
+            url: `/api/v2/users/show_many?ids=${userIds.join(",")}`,
+            type: "GET",
+            contentType: "application/json"
+        });
+
+        return users;
+    }
+
+    /**
      * Searches the users corresponding to the given query
      *
      * Fetches all the pages of the query if the fetchAllPages is set to true - defaults to true
