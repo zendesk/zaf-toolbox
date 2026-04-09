@@ -30,7 +30,7 @@ public async getUsersByIds<T = IZendeskUserFieldValue>(userIds: number[]): Promi
 
 ### API Endpoint
 
-- **URL:** `/api/v2/users/show_many.json?ids={comma-separated-ids}`
+- **URL:** `/api/v2/users/show_many?ids={comma-separated-ids}`
 - **Method:** GET
 - **Content Type:** application/json
 
@@ -43,7 +43,7 @@ public async getUsersByIds<T = IZendeskUserFieldValue>(userIds: number[]): Promi
 2. **API Call:** Make single request with IDs joined by commas
    ```typescript
    await this.client.request<ISearchUserResults<T>>({
-       url: `/api/v2/users/show_many.json?ids=${userIds.join(",")}`,
+       url: `/api/v2/users/show_many?ids=${userIds.join(",")}`,
        type: "GET",
        contentType: "application/json"
    })
@@ -133,7 +133,7 @@ This approach was chosen over alternatives for several reasons:
 
 ## Risks and Considerations
 
-- **Assumption:** Zendesk API supports `/api/v2/users/show_many.json` endpoint
+- **Assumption:** Zendesk API supports `/api/v2/users/show_many` endpoint
   - This is a standard Zendesk pattern (tickets use it)
   - If endpoint doesn't exist, fallback to individual `getUser()` calls with `Promise.all()`
   
