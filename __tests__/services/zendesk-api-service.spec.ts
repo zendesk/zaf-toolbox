@@ -276,6 +276,138 @@ describe("ZendeskService", () => {
             });
         });
 
+        describe("getUsersByIds", () => {
+            const mockUsers: IZendeskUser[] = [
+                {
+                    id: 1,
+                    name: "Test User 1",
+                    email: "test1@example.com",
+                    created_at: "2023-01-01T00:00:00Z",
+                    updated_at: "2023-01-01T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/users/1.json",
+                    time_zone: "UTC",
+                    iana_time_zone: "UTC",
+                    phone: null,
+                    photo: null,
+                    locale_id: 1,
+                    locale: "en-US",
+                    organization_id: 100,
+                    role: "end-user",
+                    verified: true,
+                    external_id: null,
+                    tags: [],
+                    alias: "",
+                    active: true,
+                    shared: false,
+                    shared_agent: false,
+                    shared_phone_number: null,
+                    last_login_at: "2023-01-01T00:00:00Z",
+                    two_factor_auth_enabled: null,
+                    signature: "",
+                    details: "",
+                    notes: "",
+                    role_type: 0,
+                    custom_role_id: 0,
+                    moderator: false,
+                    ticket_restriction: null,
+                    only_private_comments: false,
+                    restricted_agent: false,
+                    suspended: false,
+                    default_group_id: 0,
+                    report_csv: false,
+                    user_fields: {}
+                },
+                {
+                    id: 2,
+                    name: "Test User 2",
+                    email: "test2@example.com",
+                    created_at: "2023-01-02T00:00:00Z",
+                    updated_at: "2023-01-02T00:00:00Z",
+                    url: "https://example.zendesk.com/api/v2/users/2.json",
+                    time_zone: "UTC",
+                    iana_time_zone: "UTC",
+                    phone: null,
+                    photo: null,
+                    locale_id: 1,
+                    locale: "en-US",
+                    organization_id: 100,
+                    role: "end-user",
+                    verified: true,
+                    external_id: null,
+                    tags: [],
+                    alias: "",
+                    active: true,
+                    shared: false,
+                    shared_agent: false,
+                    shared_phone_number: null,
+                    last_login_at: "2023-01-02T00:00:00Z",
+                    two_factor_auth_enabled: null,
+                    signature: "",
+                    details: "",
+                    notes: "",
+                    role_type: 0,
+                    custom_role_id: 0,
+                    moderator: false,
+                    ticket_restriction: null,
+                    only_private_comments: false,
+                    restricted_agent: false,
+                    suspended: false,
+                    default_group_id: 0,
+                    report_csv: false,
+                    user_fields: {}
+                }
+            ];
+
+            it("should retrieve multiple users by their IDs", async () => {
+                requestMock.mockResolvedValueOnce({ users: mockUsers });
+
+                const result = await service.getUsersByIds([1, 2]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/show_many?ids=1,2`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual(mockUsers);
+            });
+
+            it("should handle single user ID", async () => {
+                requestMock.mockResolvedValueOnce({ users: [mockUsers[0]] });
+
+                const result = await service.getUsersByIds([1]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/show_many?ids=1`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual([mockUsers[0]]);
+            });
+
+            it("should throw an error when trying to retrieve more than 100 users", async () => {
+                const manyUserIds = Array.from({ length: 101 }, (_, index) => index + 1);
+
+                await expect(service.getUsersByIds(manyUserIds)).rejects.toThrow(
+                    "A limit of 100 users can be retrieved at a time."
+                );
+
+                expect(requestMock).not.toHaveBeenCalled();
+            });
+
+            it("should handle empty user array when user IDs don't exist", async () => {
+                requestMock.mockResolvedValueOnce({ users: [] });
+
+                const result = await service.getUsersByIds([99999]);
+
+                expect(requestMock).toHaveBeenCalledWith({
+                    url: `/api/v2/users/show_many?ids=99999`,
+                    type: "GET",
+                    contentType: "application/json"
+                });
+                expect(result).toEqual([]);
+            });
+        });
+
         describe("searchUsers", () => {
             const searchQuery = "searchQuery";
 
