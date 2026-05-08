@@ -85,11 +85,32 @@ export class ZendeskApiService {
             while (true) {
                 const nextPage = results[results.length - 1].next_page;
                 if (!nextPage) break;
-                results.push(
-                    await this.client.request<TResponse>({
-                        url: nextPage
-                    })
-                );
+                try {
+                    results.push(
+                        await this.client.request<TResponse>({
+                            url: nextPage
+                        })
+                    );
+                } catch (error: unknown) {
+                    // Stop gracefully on pagination limit error (Zendesk API limits to page 100 or 10,000 records)
+                    if (
+                        error &&
+                        typeof error === "object" &&
+                        "responseJSON" in error &&
+                        error.responseJSON &&
+                        typeof error.responseJSON === "object" &&
+                        "error" in error.responseJSON &&
+                        typeof error.responseJSON.error === "string" &&
+                        error.responseJSON.error.includes("InvalidPaginationDepth")
+                    ) {
+                        console.warn(
+                            `Reached pagination limit for ${nextPage} (page 100 / ~10,000 records). Returning partial results.`
+                        );
+                        break;
+                    }
+                    // Re-throw all other errors
+                    throw error;
+                }
             }
         }
 
