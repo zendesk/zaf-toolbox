@@ -573,6 +573,42 @@ describe("ZendeskService", () => {
                     });
                     expect(result).toEqual(tags);
                 });
+
+                it("should handle pagination limit error gracefully and return partial results", async () => {
+                    const tags1 = [{ name: "tag1" }];
+                    const tags2 = [{ name: "tag2" }];
+                    const paginationError = {
+                        responseJSON: {
+                            error: "InvalidPaginationDepth"
+                        }
+                    };
+
+                    requestMock
+                        .mockResolvedValueOnce({ tags: tags1, next_page: "next_page" })
+                        .mockResolvedValueOnce({ tags: tags2, next_page: "page_101" })
+                        .mockRejectedValueOnce(paginationError);
+
+                    const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
+
+                    const result = await service.getTags();
+
+                    expect(requestMock).toHaveBeenCalledTimes(3);
+                    expect(result).toEqual([...tags1, ...tags2]);
+                    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Reached pagination limit"));
+
+                    consoleWarnSpy.mockRestore();
+                });
+
+                it("should re-throw non-pagination errors", async () => {
+                    const tags = [{ name: "tag1" }];
+                    const otherError = new Error("Network error");
+
+                    requestMock
+                        .mockResolvedValueOnce({ tags, next_page: "next_page" })
+                        .mockRejectedValueOnce(otherError);
+
+                    await expect(service.getTags()).rejects.toThrow("Network error");
+                });
             });
 
             describe("getGroups", () => {
