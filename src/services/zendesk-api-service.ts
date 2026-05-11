@@ -103,6 +103,7 @@ export class ZendeskApiService {
                         typeof error.responseJSON.error === "string" &&
                         error.responseJSON.error.includes("InvalidPaginationDepth")
                     ) {
+                        // eslint-disable-next-line no-console
                         console.warn(
                             `Reached pagination limit for ${nextPage} (page 100 / ~10,000 records). Returning partial results.`
                         );

@@ -594,9 +594,7 @@ describe("ZendeskService", () => {
 
                     expect(requestMock).toHaveBeenCalledTimes(3);
                     expect(result).toEqual([...tags1, ...tags2]);
-                    expect(consoleWarnSpy).toHaveBeenCalledWith(
-                        expect.stringContaining("Reached pagination limit")
-                    );
+                    expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining("Reached pagination limit"));
 
                     consoleWarnSpy.mockRestore();
                 });
