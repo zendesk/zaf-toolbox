@@ -44,7 +44,9 @@ import {
     IZisIntegration,
     IZisIntegrationResponse,
     IZisJobspec,
-    IZisJobspecsResponse
+    IZisJobspecsResponse,
+    IZisOAuthConnection,
+    IZisOAuthStartResponse
 } from "@models/zendesk-integration-services";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
 import { getFromClient } from "@utils/get-from-client";
@@ -658,6 +660,43 @@ export class ZendeskApiService {
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(bundle)
+        });
+    }
+
+    /**
+     * Returns connection details for a ZIS OAuth integration.
+     *
+     * @param {string} integrationName - The name of the ZIS integration.
+     * @param {object} [options] - Optional filters. Specify either uuid or name, not both.
+     * @param {string} [options.uuid] - The UUID of the connection.
+     * @param {string} [options.name] - The name of the connection.
+     * @returns {Promise<IZisOAuthConnection>} - The OAuth connection details.
+     */
+    public async getZisOAuthConnection(
+        integrationName: string,
+        options?: { uuid?: string; name?: string }
+    ): Promise<IZisOAuthConnection> {
+        const queryParams = options ? buildUrlParams(options) : "";
+        const url = `/api/services/zis/connections/${integrationName}${queryParams ? `?${queryParams}` : ""}`;
+
+        return await this.client.request<IZisOAuthConnection>({
+            url,
+            type: "GET",
+            contentType: "application/json"
+        });
+    }
+
+    /**
+     * Starts the OAuth flow for a ZIS integration.
+     *
+     * @param {string} integrationName - The name of the ZIS integration.
+     * @returns {Promise<IZisOAuthStartResponse>} - The response containing the redirect URL and flow token.
+     */
+    public async startZisOAuthFlow(integrationName: string): Promise<IZisOAuthStartResponse> {
+        return await this.client.request<IZisOAuthStartResponse>({
+            url: `/api/services/zis/connections/oauth/start/${integrationName}`,
+            type: "POST",
+            contentType: "application/json"
         });
     }
 

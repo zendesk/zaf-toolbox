@@ -68,3 +68,19 @@ export interface ICreateInboundWebhookResponse {
     username: string;
     password: string;
 }
+
+export interface IZisOAuthConnection {
+    access_token: string;
+    created_by: string;
+    integration: string;
+    name: string;
+    uuid: string;
+    token_expiry: string;
+    token_type: string;
+    refresh_token: string;
+}
+
+export interface IZisOAuthStartResponse {
+    redirect_url: string;
+    flow_token: string;
+}

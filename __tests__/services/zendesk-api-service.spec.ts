@@ -1072,6 +1072,78 @@ describe("ZendeskService", () => {
         });
     });
 
+    describe("getZisOAuthConnection", () => {
+        const oauthConnection = {
+            access_token: "access_token_value",
+            created_by: "user@example.com",
+            integration: "integrationName",
+            name: "my_connection",
+            uuid: "uuid-1234",
+            token_expiry: "2026-12-31T00:00:00Z",
+            token_type: "bearer",
+            refresh_token: "refresh_token_value"
+        };
+
+        it("should fetch an OAuth connection without optional params", async () => {
+            requestMock.mockResolvedValueOnce(oauthConnection);
+
+            const result = await service.getZisOAuthConnection("integrationName");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/services/zis/connections/integrationName`,
+                type: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toEqual(oauthConnection);
+        });
+
+        it("should fetch an OAuth connection with uuid param", async () => {
+            requestMock.mockResolvedValueOnce(oauthConnection);
+
+            const result = await service.getZisOAuthConnection("integrationName", { uuid: "uuid-1234" });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/services/zis/connections/integrationName?uuid=uuid-1234`,
+                type: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toEqual(oauthConnection);
+        });
+
+        it("should fetch an OAuth connection with name param", async () => {
+            requestMock.mockResolvedValueOnce(oauthConnection);
+
+            const result = await service.getZisOAuthConnection("integrationName", { name: "my_connection" });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/services/zis/connections/integrationName?name=my_connection`,
+                type: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toEqual(oauthConnection);
+        });
+    });
+
+    describe("startZisOAuthFlow", () => {
+        const oauthStartResponse = {
+            redirect_url: "https://oauth.example.com/authorize?flow_token=abc123",
+            flow_token: "abc123"
+        };
+
+        it("should start the OAuth flow with the correct data", async () => {
+            requestMock.mockResolvedValueOnce(oauthStartResponse);
+
+            const result = await service.startZisOAuthFlow("integrationName");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/services/zis/connections/oauth/start/integrationName`,
+                type: "POST",
+                contentType: "application/json"
+            });
+            expect(result).toEqual(oauthStartResponse);
+        });
+    });
+
     describe("createTicket", () => {
         it("should create a ticket with the correct data", async () => {
             requestMock.mockResolvedValueOnce({
