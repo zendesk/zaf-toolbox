@@ -80,6 +80,13 @@ export interface IZisOAuthConnection {
     refresh_token: string;
 }
 
+export interface IZisOAuthStartOptions {
+    name: string;
+    oauth_client_name: string;
+    oauth_url_subdomain: string;
+    origin_oauth_redirect_url: string;
+}
+
 export interface IZisOAuthStartResponse {
     redirect_url: string;
     flow_token: string;

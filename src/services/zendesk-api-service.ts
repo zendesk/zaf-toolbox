@@ -46,6 +46,7 @@ import {
     IZisJobspec,
     IZisJobspecsResponse,
     IZisOAuthConnection,
+    IZisOAuthStartOptions,
     IZisOAuthStartResponse
 } from "@models/zendesk-integration-services";
 import { convertContentMessageToHtml } from "@utils/convert-content-message-to-html";
@@ -690,13 +691,18 @@ export class ZendeskApiService {
      * Starts the OAuth flow for a ZIS integration.
      *
      * @param {string} integrationName - The name of the ZIS integration.
+     * @param {IZisOAuthStartOptions} options - The OAuth connection parameters.
      * @returns {Promise<IZisOAuthStartResponse>} - The response containing the redirect URL and flow token.
      */
-    public async startZisOAuthFlow(integrationName: string): Promise<IZisOAuthStartResponse> {
+    public async startZisOAuthFlow(
+        integrationName: string,
+        options: IZisOAuthStartOptions
+    ): Promise<IZisOAuthStartResponse> {
         return await this.client.request<IZisOAuthStartResponse>({
             url: `/api/services/zis/connections/oauth/start/${integrationName}`,
             type: "POST",
-            contentType: "application/json"
+            contentType: "application/json",
+            data: JSON.stringify(options)
         });
     }
 
