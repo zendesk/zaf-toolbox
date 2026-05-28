@@ -1133,12 +1133,20 @@ describe("ZendeskService", () => {
         it("should start the OAuth flow with the correct data", async () => {
             requestMock.mockResolvedValueOnce(oauthStartResponse);
 
-            const result = await service.startZisOAuthFlow("integrationName");
+            const options = {
+                name: "zendesk",
+                oauth_client_name: "zendesk",
+                oauth_url_subdomain: "mycompany",
+                origin_oauth_redirect_url: "https://mycompany.zendesk.com/agent/apps/relay"
+            };
+
+            const result = await service.startZisOAuthFlow("integrationName", options);
 
             expect(requestMock).toHaveBeenCalledWith({
                 url: `/api/services/zis/connections/oauth/start/integrationName`,
                 type: "POST",
-                contentType: "application/json"
+                contentType: "application/json",
+                data: JSON.stringify(options)
             });
             expect(result).toEqual(oauthStartResponse);
         });
