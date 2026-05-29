@@ -12,6 +12,8 @@ jobs:
     get_version:
         name: Retrieve version
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         outputs:
             version: ${{ steps.package_version.outputs.version }}
         steps:
@@ -25,6 +27,8 @@ jobs:
     create-release:
         name: Create release
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         needs:
             - get_version
         env:

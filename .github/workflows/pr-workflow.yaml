@@ -79,6 +79,8 @@ jobs:
     lint:
         name: Lint the API
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         outputs:
             job_name: "Lint and verify code formatting in the API"
         steps:
@@ -97,6 +99,8 @@ jobs:
     build:
         name: Build package
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         outputs:
             job_name: "Build package"
         steps:
@@ -114,6 +118,8 @@ jobs:
     test:
         name: Execute tests
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
         outputs:
             job_name: "Execute tests"
         steps:

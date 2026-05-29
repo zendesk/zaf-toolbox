@@ -6,6 +6,9 @@ jobs:
     pr_size:
         name: Label the PR size
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: write
         if: always()
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

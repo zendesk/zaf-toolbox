@@ -19,6 +19,9 @@ env:
 jobs:
     bump-version:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: write
         steps:
             - uses: zendesk/checkout@v6
 
