@@ -2,6 +2,31 @@ import { Capabilities, IAction, IContent, IContentCarousel, IContentText, IItem 
 import { PALETTE } from "@zendeskgarden/react-theming";
 import { CSSProperties } from "react";
 
+/**
+ * Escapes HTML special characters to prevent XSS attacks.
+ */
+function escapeHtml(str: string): string {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/**
+ * Validates and sanitizes a URL. Returns the URL if safe, "#" otherwise.
+ * Blocks dangerous protocols (javascript:, data:, vbscript:) while allowing
+ * relative URLs and protocol-less URLs.
+ */
+function sanitizeUrl(url: string): string {
+    const trimmed = url.trim().toLowerCase();
+    if (trimmed.startsWith("javascript:") || trimmed.startsWith("data:") || trimmed.startsWith("vbscript:")) {
+        return "#";
+    }
+    return url;
+}
+
 export function convertContentMessageToHtml(
     content: IContent,
     useSunshineConversationDesignForAgentWorkspace = true
@@ -27,7 +52,7 @@ export function convertContentMessageToHtml(
 function SunshineConversationText(content: IContentText): string {
     const containerStyle = `border: 1px solid ${PALETTE.grey[300]}; border-radius: 20px; padding: 16px; width: fit-content`;
 
-    let html = `<p>${convertTextToHtml(content.text)}</p>`;
+    let html = `<p>${convertTextToHtml(escapeHtml(content.text))}</p>`;
 
     if (content.actions) {
         const replyActions = [];
@@ -56,21 +81,21 @@ function SunshineConversationText(content: IContentText): string {
 function SunshineConversationCarouselItem(item: IItem): string {
     const img = item.mediaUrl
         ? `<img
-            src="${item.mediaUrl}"
+            src="${sanitizeUrl(item.mediaUrl)}"
             style="${buildCSSRow({
                 objectFit: "cover",
                 height: "auto",
                 overflow: "hidden",
                 borderRadius: "20px 20px 0 0"
             })}"
-            alt="${item.altText}" />`
+            alt="${escapeHtml(item.altText ?? "")}" />`
         : "";
 
     const description = item.description
         ? `<p style="${buildCSSRow({
               lineHeight: "20px",
               margin: "4px 0"
-          })}">${convertTextToHtml(item.description, "p", "line-height: 20px")}</p>`
+          })}">${convertTextToHtml(escapeHtml(item.description ?? ""), "p", "line-height: 20px")}</p>`
         : "";
 
     return `
@@ -93,7 +118,7 @@ function SunshineConversationCarouselItem(item: IItem): string {
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                 })}">
-                    ${item.title}
+                    ${escapeHtml(item.title)}
                 </h5>
                 ${description}
                 <div style="${buildCSSRow({
@@ -167,7 +192,7 @@ function ZendeskText(content: IContentText): string {
                 fontSize: "0.875rem",
                 lineHeight: "1.25rem"
             })}">
-                ${content.text}
+                ${escapeHtml(content.text)}
             </span>
             ${
                 actions !== ""
@@ -208,9 +233,9 @@ function ZendeskCarouselItem(item: IItem): string {
     const actions = item.actions
         .map((action, index) => {
             return `
-                <a href="${"uri" in action ? action.uri : "#"}"
+                <a href="${"uri" in action ? sanitizeUrl(action.uri) : "#"}"
                     target="_blank"
-                    aria-label="${action.text}"
+                    aria-label="${escapeHtml(action.text)}"
                     style="${buildCSSRow({
                         flex: "0 0 auto",
                         display: "block",
@@ -227,14 +252,14 @@ function ZendeskCarouselItem(item: IItem): string {
                         color: "uri" in action ? PALETTE.green[600] : PALETTE.grey[600],
                         pointerEvents: "uri" in action ? "auto" : "none"
                     })}">
-                    ${action.text}
+                    ${escapeHtml(action.text)}
                 </a>
             `;
         })
         .join("");
 
     const img = item.mediaUrl
-        ? `<img src="${item.mediaUrl}"
+        ? `<img src="${sanitizeUrl(item.mediaUrl)}"
             style="${buildCSSRow({
                 height: "9.125rem",
                 objectFit: "cover",
@@ -242,7 +267,7 @@ function ZendeskCarouselItem(item: IItem): string {
                 width: "17.75rem",
                 display: "block"
             })}"
-          alt="${item.altText}" />`
+          alt="${escapeHtml(item.altText ?? "")}" />`
         : "";
 
     return `
@@ -270,14 +295,14 @@ function ZendeskCarouselItem(item: IItem): string {
                         lineHeight: "1.25rem",
                         fontWeight: 600
                     })}">
-                        ${item.title}
+                        ${escapeHtml(item.title)}
                     </h5>
                     <div style="${buildCSSRow({
                         fontSize: "0.875rem",
                         lineHeight: "1.25rem",
                         fontWeight: "normal"
                     })}">
-                        ${item.description}
+                        ${escapeHtml(item.description ?? "")}
                     </div>
                 </div>
             </div>
@@ -300,7 +325,7 @@ export function buildCSSRow(properties: CSSProperties): string {
         const regex = new RegExp(/[A-Z]/g);
         const cssKey = `${key}`.replace(regex, (v) => `-${v.toLowerCase()}`);
         // remove ' in value
-        const cssValue = `${properties[key as keyof CSSProperties]}`.replace(/'/, "");
+        const cssValue = `${properties[key as keyof CSSProperties]}`.replaceAll("'", "");
         // build the result
         // you can break the line, add indent for it if you need
         return `${accumulator}${cssKey}:${cssValue};`;
@@ -324,15 +349,15 @@ function convertActionToHtml(
 
     switch (action.type) {
         case Capabilities.LocationRequest:
-            return `<p style="${disabledStrokeStyle}">${action.text}</p>`;
+            return `<p style="${disabledStrokeStyle}">${escapeHtml(action.text)}</p>`;
         case Capabilities.Link:
-            return `<a style="${enabledStyle}" href="${action.uri}" target="_blank;">${action.text}</a>`;
+            return `<a style="${enabledStyle}" href="${sanitizeUrl(action.uri)}" target="_blank;">${escapeHtml(action.text)}</a>`;
         case Capabilities.Postback:
-            return `<p style="${disabledStyle};cursor: not-allowed;">${action.text}</p>`;
+            return `<p style="${disabledStyle};cursor: not-allowed;">${escapeHtml(action.text)}</p>`;
         case Capabilities.Reply:
-            return `<p style="${disabledStrokeStyle};cursor: not-allowed;width: fit-content;margin-right: 5px">${action.text}</p>`;
+            return `<p style="${disabledStrokeStyle};cursor: not-allowed;width: fit-content;margin-right: 5px">${escapeHtml(action.text)}</p>`;
         default:
-            return `<p>${action.text}</p>`;
+            return `<p>${escapeHtml(action.text)}</p>`;
     }
 }
 
