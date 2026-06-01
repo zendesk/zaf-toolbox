@@ -173,7 +173,7 @@ export class CustomObjectService {
     ): Promise<ICustomObjectRecord<T>[]> {
         return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records`, {
             sort: sortOptions?.sort
-        } as IListFilter);
+        });
     }
 
     /**
@@ -421,7 +421,7 @@ export class CustomObjectService {
                     page: {
                         after: response.meta.after_cursor
                     }
-                } as IListFilter;
+                };
             }
         } while (hasMore);
 
