@@ -41,7 +41,7 @@ export function transpile() {
  * Replace all aliases by the relative path
  */
 export function convertPaths() {
-    return npmExec("tscpaths -p tsconfig.json -s ./src -o ./lib/src");
+    return npmExec("tsc-alias -p tsconfig.json");
 }
 
 /**
