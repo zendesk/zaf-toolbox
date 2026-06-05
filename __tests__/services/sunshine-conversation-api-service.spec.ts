@@ -10,6 +10,8 @@ import {
     IIntegrationWhatsApp,
     ISendNotificationPayload,
     IServiceConfig,
+    ISuncoWebhook,
+    IUpdateSuncoWebhookPayload,
     UserChannelTypes
 } from "@models/sunshine-conversation";
 import { ICreateTemplate, IMessageTemplate, IResponse, ITemplate, TemplateStatus } from "@models/whats-app-template";
@@ -547,6 +549,106 @@ describe("SunshineConversationApiService", () => {
             };
 
             await sunshineConversationApiService.createWebhook("target", ["event1", "event2"], true);
+
+            expect(client.request).toHaveBeenCalledWith(options);
+        });
+    });
+
+    describe("listWebhooks", () => {
+        const webhookSample: ISuncoWebhook = {
+            _id: "webhook-id-1",
+            version: "v1.1",
+            triggers: ["message:appUser"],
+            target: "https://example.com/webhook",
+            secret: "secret123",
+            includeFullAppUser: false,
+            includeClient: true
+        };
+
+        it("should call the API and return the list of webhooks", async () => {
+            client.request.mockResolvedValueOnce({ webhooks: [webhookSample] });
+
+            const options = {
+                url: `https://api.smooch.io/v1.1/apps/suncoAppId/webhooks`,
+                type: HttpMethod.GET,
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const result = await sunshineConversationApiService.listWebhooks();
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(result).toHaveLength(1);
+            expect(result[0]).toBe(webhookSample);
+        });
+
+        it("should return an empty array when no webhooks key is present", async () => {
+            client.request.mockResolvedValueOnce({});
+
+            const result = await sunshineConversationApiService.listWebhooks();
+
+            expect(result).toEqual([]);
+        });
+    });
+
+    describe("updateWebhook", () => {
+        it("should call the API with the correct options and return the updated webhook", async () => {
+            const webhookId = "webhook-id-1";
+            const payload: IUpdateSuncoWebhookPayload = {
+                target: "https://example.com/new-target",
+                triggers: ["message:appUser", "message:appMaker"]
+            };
+            const updatedWebhook = {
+                webhook: {
+                    _id: webhookId,
+                    version: "v1.1",
+                    triggers: payload.triggers,
+                    target: payload.target,
+                    secret: "secret123",
+                    includeFullAppUser: false,
+                    includeClient: false
+                }
+            };
+            client.request.mockResolvedValueOnce(updatedWebhook);
+
+            const options = {
+                url: `https://api.smooch.io/v1.1/apps/suncoAppId/webhooks/${webhookId}`,
+                type: HttpMethod.PUT,
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                httpCompleteResponse: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const result = await sunshineConversationApiService.updateWebhook(webhookId, payload);
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(result).toBe(updatedWebhook);
+        });
+    });
+
+    describe("deleteWebhook", () => {
+        it("should call the DELETE API with the correct options", async () => {
+            const webhookId = "webhook-id-1";
+
+            const options = {
+                url: `https://api.smooch.io/v1.1/apps/suncoAppId/webhooks/${webhookId}`,
+                type: HttpMethod.DELETE,
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            await sunshineConversationApiService.deleteWebhook(webhookId);
 
             expect(client.request).toHaveBeenCalledWith(options);
         });

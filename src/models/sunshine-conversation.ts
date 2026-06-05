@@ -774,7 +774,7 @@ export interface ISunshineConversationGetIntegrationsFilters {
     types: string;
 }
 
-export interface ISuncoWebhookResponseWebhook {
+export interface ISuncoWebhook {
     _id: string;
     version: string;
     triggers: string[];
@@ -785,5 +785,11 @@ export interface ISuncoWebhookResponseWebhook {
 }
 
 export interface ICreateSuncoWebhookResponse {
-    webhook: ISuncoWebhookResponseWebhook;
+    webhook: ISuncoWebhook;
+}
+
+export interface IUpdateSuncoWebhookPayload {
+    target?: string;
+    triggers?: string[];
+    includeClient?: boolean;
 }
