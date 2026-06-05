@@ -1,6 +1,19 @@
 import { Capabilities, IAction, IContent, IContentCarousel, IContentText, IItem } from "@models/index";
-import { PALETTE } from "@zendeskgarden/react-theming";
 import { CSSProperties } from "react";
+
+/**
+ * Zendesk Garden palette values inlined to avoid a runtime dependency on
+ *
+ * @zendeskgarden/react-theming and styled-components for static color constants.
+ *
+ * Source: @zendeskgarden/react-theming v9.15.5
+ */
+const PALETTE = {
+    grey: { 200: "#e8eaec", 300: "#d8dcde", 400: "#b0b8be", 600: "#848f99" },
+    blue: { 600: "#2694d6" },
+    green: { 600: "#26a178" },
+    mint: { 600: "#16a260" }
+};
 
 /**
  * Escapes HTML special characters to prevent XSS attacks.
