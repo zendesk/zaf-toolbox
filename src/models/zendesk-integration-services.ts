@@ -69,11 +69,6 @@ export interface ICreateInboundWebhookResponse {
     password: string;
 }
 
-/**
- * A ZIS inbound webhook record as returned by the read/list endpoints.
- * Credentials (username/password) are omitted — only the creation response
- * exposes them.
- */
 export interface IZisInboundWebhook {
     id: string;
     uuid: string;
