@@ -1056,6 +1056,65 @@ describe("ZendeskService", () => {
         });
     });
 
+    describe("listZisInboundWebhooks", () => {
+        const inboundWebhookSample = {
+            id: "1",
+            uuid: "uuid-abc-123",
+            zendesk_account_id: 42,
+            path: "/api/services/zis/inbound_webhooks/generic/integrationName/uuid-abc-123",
+            integration: "integrationName",
+            source_system: "my-system",
+            event_type: "ticket.created"
+        };
+
+        it("should fetch all inbound webhooks for the integration", async () => {
+            requestMock.mockResolvedValueOnce({ inbound_webhooks: [inboundWebhookSample] });
+
+            const result = await service.listZisInboundWebhooks("integrationName");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: "/api/services/zis/inbound_webhooks/generic/integrationName/all",
+                type: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toHaveLength(1);
+            expect(result[0]).toEqual(inboundWebhookSample);
+        });
+
+        it("should return an empty array when no inbound_webhooks key is present", async () => {
+            requestMock.mockResolvedValueOnce({});
+
+            const result = await service.listZisInboundWebhooks("integrationName");
+
+            expect(result).toEqual([]);
+        });
+    });
+
+    describe("showZisInboundWebhook", () => {
+        const inboundWebhookSample = {
+            id: "1",
+            uuid: "uuid-abc-123",
+            zendesk_account_id: 42,
+            path: "/api/services/zis/inbound_webhooks/generic/integrationName/uuid-abc-123",
+            integration: "integrationName",
+            source_system: "my-system",
+            event_type: "ticket.created"
+        };
+
+        it("should fetch a single inbound webhook by UUID", async () => {
+            requestMock.mockResolvedValueOnce(inboundWebhookSample);
+
+            const result = await service.showZisInboundWebhook("integrationName", "uuid-abc-123");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: "/api/services/zis/inbound_webhooks/generic/integrationName/uuid-abc-123",
+                type: "GET",
+                contentType: "application/json"
+            });
+            expect(result).toEqual(inboundWebhookSample);
+        });
+    });
+
     describe("uploadZisBundle", () => {
         it("should upload a Zis bundle with the correct data", async () => {
             await service.uploadZisBundle("integrationName", {

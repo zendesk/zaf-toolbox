@@ -17,7 +17,9 @@ import {
     IMetadata,
     IMessageTemplate,
     ISendNotification,
-    ICreateSuncoWebhookResponse
+    ICreateSuncoWebhookResponse,
+    ISuncoWebhook,
+    IUpdateSuncoWebhookPayload
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
@@ -262,6 +264,46 @@ export class SunshineConversationApiService {
                 triggers,
                 includeClient
             })
+        );
+    }
+
+    /**
+     * List all webhooks registered for the application.
+     *
+     * @link https://docs.smooch.io/rest/#tag/Webhooks/operation/listWebhooks
+     * @returns Array of webhooks, or an empty array if none are configured
+     */
+    public async listWebhooks(): Promise<ISuncoWebhook[]> {
+        const response = await this.client.request<{ webhooks: ISuncoWebhook[] }>(
+            this.createV1Options(`/apps/${this.settings.appId}/webhooks`, HttpMethod.GET)
+        );
+        return response.webhooks ?? [];
+    }
+
+    /**
+     * Update an existing webhook for the application.
+     *
+     * @param webhookId - The ID of the webhook to update
+     * @param payload - The fields to update on the webhook
+     * @returns The updated webhook wrapped in the standard response envelope
+     */
+    public async updateWebhook(
+        webhookId: string,
+        payload: IUpdateSuncoWebhookPayload
+    ): Promise<ICreateSuncoWebhookResponse> {
+        return await this.client.request<ICreateSuncoWebhookResponse>(
+            this.createV1Options(`/apps/${this.settings.appId}/webhooks/${webhookId}`, HttpMethod.PUT, payload)
+        );
+    }
+
+    /**
+     * Delete a webhook from the application.
+     *
+     * @param webhookId - The ID of the webhook to delete
+     */
+    public async deleteWebhook(webhookId: string): Promise<void> {
+        await this.client.request(
+            this.createV1Options(`/apps/${this.settings.appId}/webhooks/${webhookId}`, HttpMethod.DELETE)
         );
     }
 }

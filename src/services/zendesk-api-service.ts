@@ -41,6 +41,7 @@ import {
     ICreateConnectionResponse,
     ICreateInboundWebhookResponse,
     ICreateZisBasicAuthConnection,
+    IZisInboundWebhook,
     IZisIntegration,
     IZisIntegrationResponse,
     IZisJobspec,
@@ -703,6 +704,40 @@ export class ZendeskApiService {
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(options)
+        });
+    }
+
+    /**
+     * List all ZIS inbound webhooks for a given integration.
+     *
+     * @note This endpoint is undocumented but functional. It aggregates all
+     * inbound webhook records for the integration under the `/all` path.
+     *
+     * @param integrationName - The name of the ZIS integration
+     * @returns Array of inbound webhooks, or an empty array if none exist
+     */
+    public async listZisInboundWebhooks(integrationName: string): Promise<IZisInboundWebhook[]> {
+        const response = await this.client.request<{ inbound_webhooks: IZisInboundWebhook[] }>({
+            url: `/api/services/zis/inbound_webhooks/generic/${integrationName}/all`,
+            type: "GET",
+            contentType: "application/json"
+        });
+        return response.inbound_webhooks ?? [];
+    }
+
+    /**
+     * Retrieve a single ZIS inbound webhook by UUID.
+     *
+     * @link https://developer.zendesk.com/api-reference/integration-services/inbound-webhooks/inbound_webhooks/#show-inbound-webhook-by-uuid
+     * @param integrationName - The name of the ZIS integration
+     * @param uuid - The UUID of the inbound webhook
+     * @returns The inbound webhook record
+     */
+    public async showZisInboundWebhook(integrationName: string, uuid: string): Promise<IZisInboundWebhook> {
+        return await this.client.request<IZisInboundWebhook>({
+            url: `/api/services/zis/inbound_webhooks/generic/${integrationName}/${uuid}`,
+            type: "GET",
+            contentType: "application/json"
         });
     }
 

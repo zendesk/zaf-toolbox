@@ -787,3 +787,19 @@ export interface ISuncoWebhookResponseWebhook {
 export interface ICreateSuncoWebhookResponse {
     webhook: ISuncoWebhookResponseWebhook;
 }
+
+export interface ISuncoWebhook {
+    _id: string;
+    version: string;
+    triggers: string[];
+    target: string;
+    secret: string;
+    includeFullAppUser: boolean;
+    includeClient: boolean;
+}
+
+export interface IUpdateSuncoWebhookPayload {
+    target?: string;
+    triggers?: string[];
+    includeClient?: boolean;
+}

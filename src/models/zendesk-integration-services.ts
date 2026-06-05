@@ -69,6 +69,21 @@ export interface ICreateInboundWebhookResponse {
     password: string;
 }
 
+/**
+ * A ZIS inbound webhook record as returned by the read/list endpoints.
+ * Credentials (username/password) are omitted — only the creation response
+ * exposes them.
+ */
+export interface IZisInboundWebhook {
+    id: string;
+    uuid: string;
+    zendesk_account_id: number;
+    path: string;
+    integration: string;
+    source_system: string;
+    event_type: string;
+}
+
 export interface IZisOAuthConnection {
     access_token: string;
     created_by: string;
