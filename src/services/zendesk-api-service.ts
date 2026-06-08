@@ -717,12 +717,12 @@ export class ZendeskApiService {
      * @returns Array of inbound webhooks, or an empty array if none exist
      */
     public async listZisInboundWebhooks(integrationName: string): Promise<IZisInboundWebhook[]> {
-        const response = await this.client.request<{ inbound_webhooks: IZisInboundWebhook[] }>({
+        const response = await this.client.request<{ webhooks: IZisInboundWebhook[] }>({
             url: `/api/services/zis/inbound_webhooks/generic/${integrationName}/all`,
             type: "GET",
             contentType: "application/json"
         });
-        return response.inbound_webhooks ?? [];
+        return response.webhooks ?? [];
     }
 
     /**
