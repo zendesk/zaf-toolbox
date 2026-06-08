@@ -1068,7 +1068,7 @@ describe("ZendeskService", () => {
         };
 
         it("should fetch all inbound webhooks for the integration", async () => {
-            requestMock.mockResolvedValueOnce({ inbound_webhooks: [inboundWebhookSample] });
+            requestMock.mockResolvedValueOnce({ webhooks: [inboundWebhookSample] });
 
             const result = await service.listZisInboundWebhooks("integrationName");
 
@@ -1081,7 +1081,7 @@ describe("ZendeskService", () => {
             expect(result[0]).toEqual(inboundWebhookSample);
         });
 
-        it("should return an empty array when no inbound_webhooks key is present", async () => {
+        it("should return an empty array when no webhooks key is present", async () => {
             requestMock.mockResolvedValueOnce({});
 
             const result = await service.listZisInboundWebhooks("integrationName");
