@@ -22,7 +22,7 @@ import {
     IUpdateSuncoWebhookPayload
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
-import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
+import { BSUID_REGEX, INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
 import { IClient } from "@models/zaf-client";
 
 export class SunshineConversationApiService {
@@ -201,19 +201,29 @@ export class SunshineConversationApiService {
     }
 
     /**
-     * Send a notification to a user using Twilio or MessageBirds
+     * Send a notification to a user using Twilio, MessageBird, or WhatsApp.
      *
-     * @throws Error when the integration passed isn't supported OR if the phone number is invalid
+     * @param destinationId - E.164 phone number (e.g. +12025551234) for any supported channel, or a Sunco BSUID (e.g. US.13491208655302741918) for WhatsApp only.
+     * @throws SyntaxError when destinationId matches neither an E.164 phone nor a BSUID, or when a BSUID is supplied with a non-WhatsApp integration
+     * @throws UnsupportedError when the integration type is not supported
      */
     public async sendNotification(
         integration: IIntegration,
-        phoneNumber: string,
+        destinationId: string,
         message: IContent,
         metadata?: IMetadata
     ): Promise<string> {
-        // Validation of the phone number.
-        if (!phoneNumber.match(INTERNATIONAL_PHONE_NUMBER_REGEX)) {
-            throw SyntaxError("Phone number should follow this format: +<dial_code><number>");
+        const isPhone = INTERNATIONAL_PHONE_NUMBER_REGEX.test(destinationId);
+        const isBsuid = BSUID_REGEX.test(destinationId);
+
+        if (!isPhone && !isBsuid) {
+            throw SyntaxError(
+                "destinationId must be an E.164 phone number (e.g. +12025551234) or a BSUID (e.g. US.13491208655302741918)"
+            );
+        }
+
+        if (isBsuid && integration.type !== UserChannelTypes.WhatsApp) {
+            throw SyntaxError("A BSUID destinationId is only supported for WhatsApp integrations");
         }
 
         // Validation of the channel used
@@ -228,7 +238,7 @@ export class SunshineConversationApiService {
         const payload: ISendNotificationPayload = {
             destination: {
                 integrationId: integration.id,
-                destinationId: phoneNumber
+                destinationId
             },
             author: {
                 role: "appMaker"
