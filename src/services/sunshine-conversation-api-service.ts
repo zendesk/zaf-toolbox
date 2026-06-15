@@ -203,9 +203,9 @@ export class SunshineConversationApiService {
     /**
      * Send a notification to a user using Twilio, MessageBird, or WhatsApp.
      *
-     * @param destinationId - E.164 phone number (e.g. +12025551234) for any supported channel, or a Sunco BSUID (e.g. US.13491208655302741918) for WhatsApp only.
-     * @throws SyntaxError when destinationId matches neither an E.164 phone nor a BSUID, or when a BSUID is supplied with a non-WhatsApp integration
+     * @param destinationId - E.164 phone number (e.g. +12025551234) for Twilio and MessageBird; E.164 phone or BSUID (e.g. US.13491208655302741918) for WhatsApp.
      * @throws UnsupportedError when the integration type is not supported
+     * @throws SyntaxError when destinationId does not match the format accepted by the given integration
      */
     public async sendNotification(
         integration: IIntegration,
@@ -213,26 +213,27 @@ export class SunshineConversationApiService {
         message: IContent,
         metadata?: IMetadata
     ): Promise<string> {
-        const isPhone = INTERNATIONAL_PHONE_NUMBER_REGEX.test(destinationId);
-        const isBsuid = BSUID_REGEX.test(destinationId);
-
-        if (!isPhone && !isBsuid) {
-            throw SyntaxError(
-                "destinationId must be an E.164 phone number (e.g. +12025551234) or a BSUID (e.g. US.13491208655302741918)"
-            );
-        }
-
-        if (isBsuid && integration.type !== UserChannelTypes.WhatsApp) {
-            throw SyntaxError("A BSUID destinationId is only supported for WhatsApp integrations");
-        }
-
-        // Validation of the channel used
         if (
             integration.type !== UserChannelTypes.MessageBirds &&
             integration.type !== UserChannelTypes.Twilio &&
             integration.type !== UserChannelTypes.WhatsApp
         ) {
             throw new UnsupportedError(integration.type);
+        }
+
+        const isPhone = INTERNATIONAL_PHONE_NUMBER_REGEX.test(destinationId);
+
+        if (integration.type === UserChannelTypes.WhatsApp) {
+            const isBsuid = BSUID_REGEX.test(destinationId);
+            if (!isPhone && !isBsuid) {
+                throw SyntaxError(
+                    "destinationId for WhatsApp must be an E.164 phone number (e.g. +12025551234) or a BSUID (e.g. US.13491208655302741918)"
+                );
+            }
+        } else if (!isPhone) {
+            throw SyntaxError(
+                `destinationId for ${integration.type} must be an E.164 phone number (e.g. +12025551234)`
+            );
         }
 
         const payload: ISendNotificationPayload = {

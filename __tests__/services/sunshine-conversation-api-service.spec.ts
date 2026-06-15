@@ -418,7 +418,7 @@ describe("SunshineConversationApiService", () => {
             }).rejects.toThrow(UnsupportedError);
         });
 
-        it("should throw a SyntaxError when destinationId is neither a valid E.164 phone nor a BSUID", async () => {
+        it("should throw a SyntaxError when a WhatsApp destinationId is neither E.164 nor BSUID", async () => {
             const invalidIds = ["+123", "not-a-phone", "us.123", "U.123", "US.", "12345"];
             for (const id of invalidIds) {
                 await expect(
@@ -427,7 +427,7 @@ describe("SunshineConversationApiService", () => {
             }
         });
 
-        it("should throw a SyntaxError when a BSUID is used with a non-WhatsApp integration", async () => {
+        it("should throw a SyntaxError when a Twilio destinationId is not an E.164 phone", async () => {
             const twilioIntegration: IIntegrationSuncoTwilio = {
                 id: "id",
                 status: "status",
@@ -440,9 +440,12 @@ describe("SunshineConversationApiService", () => {
                 phoneNumber: "+12345678900"
             };
 
-            await expect(
-                sunshineConversationApiService.sendNotification(twilioIntegration, bsuidSample, contentSample)
-            ).rejects.toThrow(SyntaxError);
+            const invalidIds = [bsuidSample, "+123", "not-a-phone", "12345"];
+            for (const id of invalidIds) {
+                await expect(
+                    sunshineConversationApiService.sendNotification(twilioIntegration, id, contentSample)
+                ).rejects.toThrow(SyntaxError);
+            }
         });
 
         it("should call the API with a valid E.164 phone number", async () => {
