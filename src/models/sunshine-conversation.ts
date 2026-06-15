@@ -793,3 +793,57 @@ export interface IUpdateSuncoWebhookPayload {
     triggers?: string[];
     includeClient?: boolean;
 }
+
+/**
+ * Channel-specific user profile returned by the Sunco API (the "client" object
+ * that appears on app-user records and in webhook payloads when includeClient is true).
+ */
+export interface ISuncoClient {
+    /**
+     * The Sunco-internal client ID.
+     */
+    id: string;
+    /**
+     * The channel type (e.g. "whatsapp", "twilio").
+     */
+    type: string;
+    /**
+     * The channel-side identifier for this client.
+     *
+     * For WhatsApp clients this field is transitioning:
+     * - Legacy (pre-BSUID migration): contains the user's phone number as a numeric E.164-style string (e.g. "12025551234").
+     * - Post-migration: contains the BSUID (e.g. "US.abc123…").
+     *
+     * Both formats coexist indefinitely — legacy clients are not updated retroactively.
+     * Use BSUID_REGEX / INTERNATIONAL_PHONE_NUMBER_REGEX to detect which format you
+     * have, and read the phone number from additionalIdentifiers instead of this field.
+     */
+    externalId?: string;
+    /**
+     * Supplemental identifiers added to the client record when Meta sends a new event
+     * after the BSUID migration date (e.g. an inbound message or status update).
+     *
+     * This field is absent on client records that have not received a new event since
+     * before the migration. Never assume it is present — always handle both cases:
+     * additionalIdentifiers present but phoneNumber entry absent, and the field absent
+     * entirely.
+     */
+    additionalIdentifiers?: ISuncoClientAdditionalIdentifier[];
+}
+
+/**
+ * A single entry in the ISuncoClient.additionalIdentifiers array.
+ */
+export interface ISuncoClientAdditionalIdentifier {
+    /**
+     * The identifier type.
+     *
+     * - "phoneNumber": the user's WhatsApp phone number in E.164 format. May be absent when the user has enabled the WhatsApp username feature and the 30-day interaction window with this business number has lapsed.
+     * - "parentUserId": a BSUID representing the user's parent account in the Meta portfolio hierarchy, when applicable.
+     */
+    key: "phoneNumber" | "parentUserId";
+    /**
+     * The identifier value.
+     */
+    value: string;
+}

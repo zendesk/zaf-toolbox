@@ -22,7 +22,7 @@ import {
     IUpdateSuncoWebhookPayload
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
-import { INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
+import { BSUID_REGEX, INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
 import { IClient } from "@models/zaf-client";
 
 export class SunshineConversationApiService {
@@ -201,22 +201,18 @@ export class SunshineConversationApiService {
     }
 
     /**
-     * Send a notification to a user using Twilio or MessageBirds
+     * Send a notification to a user using Twilio, MessageBird, or WhatsApp.
      *
-     * @throws Error when the integration passed isn't supported OR if the phone number is invalid
+     * @param destinationId - E.164 phone number (e.g. +12025551234) for Twilio and MessageBird; E.164 phone or BSUID (e.g. US.13491208655302741918) for WhatsApp.
+     * @throws UnsupportedError when the integration type is not supported
+     * @throws SyntaxError when destinationId does not match the format accepted by the given integration
      */
     public async sendNotification(
         integration: IIntegration,
-        phoneNumber: string,
+        destinationId: string,
         message: IContent,
         metadata?: IMetadata
     ): Promise<string> {
-        // Validation of the phone number.
-        if (!phoneNumber.match(INTERNATIONAL_PHONE_NUMBER_REGEX)) {
-            throw SyntaxError("Phone number should follow this format: +<dial_code><number>");
-        }
-
-        // Validation of the channel used
         if (
             integration.type !== UserChannelTypes.MessageBirds &&
             integration.type !== UserChannelTypes.Twilio &&
@@ -225,10 +221,25 @@ export class SunshineConversationApiService {
             throw new UnsupportedError(integration.type);
         }
 
+        const isPhone = INTERNATIONAL_PHONE_NUMBER_REGEX.test(destinationId);
+
+        if (integration.type === UserChannelTypes.WhatsApp) {
+            const isBsuid = BSUID_REGEX.test(destinationId);
+            if (!isPhone && !isBsuid) {
+                throw SyntaxError(
+                    "destinationId for WhatsApp must be an E.164 phone number (e.g. +12025551234) or a BSUID (e.g. US.13491208655302741918)"
+                );
+            }
+        } else if (!isPhone) {
+            throw SyntaxError(
+                `destinationId for ${integration.type} must be an E.164 phone number (e.g. +12025551234)`
+            );
+        }
+
         const payload: ISendNotificationPayload = {
             destination: {
                 integrationId: integration.id,
-                destinationId: phoneNumber
+                destinationId
             },
             author: {
                 role: "appMaker"

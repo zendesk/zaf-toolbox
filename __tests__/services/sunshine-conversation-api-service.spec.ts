@@ -381,6 +381,7 @@ describe("SunshineConversationApiService", () => {
 
     describe("sendNotification", () => {
         const phoneNumberSample = "+11231231234";
+        const bsuidSample = "US.13491208655302741918";
 
         const contentSample: IContent = {
             type: Capabilities.Text,
@@ -417,13 +418,37 @@ describe("SunshineConversationApiService", () => {
             }).rejects.toThrow(UnsupportedError);
         });
 
-        it("should throw an error if the phone number doesn't respect the regex", async () => {
-            await expect(async () => {
-                await sunshineConversationApiService.sendNotification(integrationSample, "+123", contentSample);
-            }).rejects.toThrow(SyntaxError);
+        it("should throw a SyntaxError when a WhatsApp destinationId is neither E.164 nor BSUID", async () => {
+            const invalidIds = ["+123", "not-a-phone", "us.123", "U.123", "US.", "12345"];
+            for (const id of invalidIds) {
+                await expect(
+                    sunshineConversationApiService.sendNotification(integrationSample, id, contentSample)
+                ).rejects.toThrow(SyntaxError);
+            }
         });
 
-        it("should call the API", async () => {
+        it("should throw a SyntaxError when a Twilio destinationId is not an E.164 phone", async () => {
+            const twilioIntegration: IIntegrationSuncoTwilio = {
+                id: "id",
+                status: "status",
+                "type": UserChannelTypes.Twilio,
+                isTalk: false,
+                accountSid: "accountSid",
+                phoneNumberSid: "phoneNumberSid",
+                messagingServiceSid: "messagingServiceSid",
+                displayName: "Twilio",
+                phoneNumber: "+12345678900"
+            };
+
+            const invalidIds = [bsuidSample, "+123", "not-a-phone", "12345"];
+            for (const id of invalidIds) {
+                await expect(
+                    sunshineConversationApiService.sendNotification(twilioIntegration, id, contentSample)
+                ).rejects.toThrow(SyntaxError);
+            }
+        });
+
+        it("should call the API with a valid E.164 phone number", async () => {
             client.request.mockResolvedValueOnce({
                 responseJSON: { notification: { _id: "819580915u1514141g" } }
             });
@@ -444,6 +469,46 @@ describe("SunshineConversationApiService", () => {
             const res = await sunshineConversationApiService.sendNotification(
                 integrationSample,
                 phoneNumberSample,
+                contentSample
+            );
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(res).toStrictEqual("819580915u1514141g");
+        });
+
+        it("should call the API with a valid BSUID as destinationId", async () => {
+            client.request.mockResolvedValueOnce({
+                responseJSON: { notification: { _id: "819580915u1514141g" } }
+            });
+
+            const bsuidPayload: ISendNotificationPayload = {
+                destination: {
+                    integrationId: integrationSample.id,
+                    destinationId: bsuidSample
+                },
+                author: {
+                    role: "appMaker"
+                },
+                message: contentSample,
+                messageSchema: UserChannelTypes.WhatsApp
+            };
+
+            const options = {
+                url: `https://api.smooch.io/v1.1/apps/suncoAppId/notifications`,
+                type: HttpMethod.POST,
+                contentType: "application/json",
+                data: JSON.stringify(bsuidPayload),
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                httpCompleteResponse: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const res = await sunshineConversationApiService.sendNotification(
+                integrationSample,
+                bsuidSample,
                 contentSample
             );
 
