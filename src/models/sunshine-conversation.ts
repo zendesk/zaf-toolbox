@@ -847,3 +847,27 @@ export interface ISuncoClientAdditionalIdentifier {
      */
     value: string;
 }
+
+export interface ISuncoUserProfile {
+    givenName?: string;
+    surname?: string;
+    email?: string;
+    avatarUrl?: string;
+    locale?: string;
+}
+
+export interface ISuncoUser {
+    id: string;
+    externalId?: string;
+    signedUpAt?: string;
+    profile?: ISuncoUserProfile;
+    metadata?: IMetadata;
+}
+
+export interface IGetUserResponse {
+    user: ISuncoUser;
+}
+
+export interface IListClientsResponse {
+    clients: ISuncoClient[];
+}
