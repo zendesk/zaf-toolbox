@@ -10,4 +10,5 @@ export * from "@models/zendesk-user";
 export * from "@models/custom-objects";
 export * from "@models/zendesk-api";
 export * from "@models/zendesk-brands";
+export * from "@models/zendesk-user-identity";
 export * from "@models/zendesk-view";
