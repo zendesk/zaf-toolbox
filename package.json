@@ -1,6 +1,6 @@
 {
     "name": "@zendesk/zaf-toolbox",
-    "version": "1.9.0",
+    "version": "1.8.1",
     "description": "A toolbox for ZAF application built with 🩷 by Zendesk Labs",
     "main": "lib/src/index.js",
     "types": "lib/src/index.d.ts",
