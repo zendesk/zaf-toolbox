@@ -718,4 +718,95 @@ describe("SunshineConversationApiService", () => {
             expect(client.request).toHaveBeenCalledWith(options);
         });
     });
+
+    describe("getUser", () => {
+        it("should call the API and return the user", async () => {
+            const userSample = {
+                id: "user-id-1",
+                externalId: "ext-123",
+                signedUpAt: "2024-01-01T00:00:00.000Z",
+                profile: {
+                    givenName: "John",
+                    surname: "Doe",
+                    email: "john@example.com"
+                }
+            };
+            client.request.mockResolvedValueOnce({ user: userSample });
+
+            const options = {
+                url: `https://api.smooch.io/v2/apps/suncoAppId/users/user-id-1`,
+                type: HttpMethod.GET,
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const result = await sunshineConversationApiService.getUser("user-id-1");
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(result).toBe(userSample);
+        });
+
+        it("should support fetching a user by external ID", async () => {
+            const userSample = {
+                id: "user-id-2",
+                externalId: "ext-456"
+            };
+            client.request.mockResolvedValueOnce({ user: userSample });
+
+            const options = {
+                url: `https://api.smooch.io/v2/apps/suncoAppId/users/ext-456`,
+                type: HttpMethod.GET,
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const result = await sunshineConversationApiService.getUser("ext-456");
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(result).toBe(userSample);
+        });
+    });
+
+    describe("listClients", () => {
+        const clientSample = {
+            id: "client-id-1",
+            type: "whatsapp",
+            externalId: "US.13491208655302741918",
+            additionalIdentifiers: [{ key: "phoneNumber", value: "+11231231234" }]
+        };
+
+        it("should call the API and return the clients", async () => {
+            client.request.mockResolvedValueOnce({ clients: [clientSample] });
+
+            const options = {
+                url: `https://api.smooch.io/v2/apps/suncoAppId/users/user-id-1/clients`,
+                type: HttpMethod.GET,
+                secure: appSettings.useSecure,
+                crossDomain: true,
+                headers: {
+                    Authorization: expect.any(String) as string
+                }
+            };
+
+            const result = await sunshineConversationApiService.listClients("user-id-1");
+
+            expect(client.request).toHaveBeenCalledWith(options);
+            expect(result).toHaveLength(1);
+            expect(result[0]).toBe(clientSample);
+        });
+
+        it("should return an empty array when no clients are present", async () => {
+            client.request.mockResolvedValueOnce({ clients: [] });
+
+            const result = await sunshineConversationApiService.listClients("user-id-1");
+
+            expect(result).toEqual([]);
+        });
+    });
 });

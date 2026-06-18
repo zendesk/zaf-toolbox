@@ -19,7 +19,11 @@ import {
     ISendNotification,
     ICreateSuncoWebhookResponse,
     ISuncoWebhook,
-    IUpdateSuncoWebhookPayload
+    IUpdateSuncoWebhookPayload,
+    ISuncoUser,
+    IGetUserResponse,
+    ISuncoClient,
+    IListClientsResponse
 } from "@models/index";
 import { buildUrlParams } from "@utils/build-url-params";
 import { BSUID_REGEX, INTERNATIONAL_PHONE_NUMBER_REGEX } from "@utils/regex";
@@ -316,5 +320,29 @@ export class SunshineConversationApiService {
         await this.client.request(
             this.createV1Options(`/apps/${this.settings.appId}/webhooks/${webhookId}`, HttpMethod.DELETE)
         );
+    }
+
+    /**
+     * Retrieve a user by ID or external ID.
+     *
+     * @param userIdOrExternalId - The user's ID or external ID
+     */
+    public async getUser(userIdOrExternalId: string): Promise<ISuncoUser> {
+        const response = await this.client.request<IGetUserResponse>(
+            this.createV2Options(`/apps/${this.settings.appId}/users/${userIdOrExternalId}`, HttpMethod.GET)
+        );
+        return response.user;
+    }
+
+    /**
+     * List all clients for a given user.
+     *
+     * @param userIdOrExternalId - The user's ID or external ID
+     */
+    public async listClients(userIdOrExternalId: string): Promise<ISuncoClient[]> {
+        const response = await this.client.request<IListClientsResponse>(
+            this.createV2Options(`/apps/${this.settings.appId}/users/${userIdOrExternalId}/clients`, HttpMethod.GET)
+        );
+        return response.clients;
     }
 }
