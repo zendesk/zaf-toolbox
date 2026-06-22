@@ -804,9 +804,9 @@ export interface ISuncoClient {
      */
     id: string;
     /**
-     * The channel type (e.g. "whatsapp", "twilio").
+     * The channel type. Mirrors the typing used by IIntegrationBase.type.
      */
-    type: string;
+    type: UserChannelTypes;
     /**
      * The channel-side identifier for this client.
      *
