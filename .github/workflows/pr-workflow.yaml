@@ -34,7 +34,7 @@ jobs:
                       gh api --method DELETE /repos/${{ github.repository }}/issues/comments/$commentId --silent
                   done
             - name: Checkout code
-              uses: zendesk/checkout@v6
+              uses: zendesk/checkout@v7
               with:
                   fetch-depth: 0
 
@@ -84,7 +84,7 @@ jobs:
         outputs:
             job_name: "Lint and verify code formatting in the API"
         steps:
-            - uses: zendesk/checkout@v6
+            - uses: zendesk/checkout@v7
             - uses: zendesk/setup-node@v6
               with:
                   node-version: 20
@@ -104,7 +104,7 @@ jobs:
         outputs:
             job_name: "Build package"
         steps:
-            - uses: zendesk/checkout@v6
+            - uses: zendesk/checkout@v7
             - uses: zendesk/setup-node@v6
               with:
                   node-version: 20
@@ -123,7 +123,7 @@ jobs:
         outputs:
             job_name: "Execute tests"
         steps:
-            - uses: zendesk/checkout@v6
+            - uses: zendesk/checkout@v7
             - uses: zendesk/setup-node@v6
               with:
                   node-version: 20
