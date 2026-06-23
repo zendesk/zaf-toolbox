@@ -794,23 +794,35 @@ export interface IUpdateSuncoWebhookPayload {
     includeClient?: boolean;
 }
 
+export enum SuncoClientStatus {
+    Active = "active",
+    Blocked = "blocked",
+    Inactive = "inactive",
+    Pending = "pending"
+}
+
 /**
  * Channel-specific user profile returned by the Sunco API (the "client" object
  * that appears on app-user records and in webhook payloads when includeClient is true).
  */
 export interface ISuncoClient {
     /**
-     * The Sunco-internal client ID.
+     * The unique ID of the client.
      */
     id: string;
-    /**
-     * The ID of the integration this client belongs to.
-     */
-    integrationId: string;
     /**
      * The channel type. Mirrors the typing used by IIntegrationBase.type.
      */
     type: UserChannelTypes;
+    /**
+     * Indicates if the client is able to receive messages or not.
+     */
+    status: SuncoClientStatus;
+    /**
+     * The ID of the integration this client was created for. Null for SDK clients,
+     * which incorporate multiple integrations.
+     */
+    integrationId: string | null;
     /**
      * The channel-side identifier for this client.
      *
@@ -822,7 +834,26 @@ export interface ISuncoClient {
      * Use BSUID_REGEX / INTERNATIONAL_PHONE_NUMBER_REGEX to detect which format you
      * have, and read the phone number from additionalIdentifiers instead of this field.
      */
-    externalId?: string;
+    externalId: string | null;
+    /**
+     * Datetime string (YYYY-MM-DDThh:mm:ss.SSSZ) of the last time the user interacted
+     * with this client. Null if the user has never interacted.
+     */
+    lastSeen: string | null;
+    /**
+     * Timestamp (YYYY-MM-DDThh:mm:ss.SSSZ) signifying when the client was added to
+     * the user. Null if not yet linked.
+     */
+    linkedAt: string | null;
+    /**
+     * The user's display name on the channel. Null if not available.
+     */
+    displayName: string | null;
+    /**
+     * A flat curated object with platform-specific properties. All keys are optional
+     * and not guaranteed to be available. Null if not available.
+     */
+    info: Record<string, unknown> | null;
     /**
      * Supplemental identifiers added to the client record when Meta sends a new event
      * after the BSUID migration date (e.g. an inbound message or status update).
