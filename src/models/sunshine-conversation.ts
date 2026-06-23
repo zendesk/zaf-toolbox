@@ -804,6 +804,10 @@ export interface ISuncoClient {
      */
     id: string;
     /**
+     * The ID of the integration this client belongs to.
+     */
+    integrationId: string;
+    /**
      * The channel type. Mirrors the typing used by IIntegrationBase.type.
      */
     type: UserChannelTypes;
