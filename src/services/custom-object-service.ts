@@ -18,7 +18,10 @@ import {
     ISearchFilterCustomObjectRecords,
     ISetCustomObjectRecordFieldBody,
     IUpdateCustomObjectFieldAutonumberingPropertiesBody,
-    IUpdateCustomObjectFieldBody
+    IUpdateCustomObjectFieldBody,
+    ICustomObjectRecordEvent,
+    IListCustomObjectRecordEventsResponse,
+    IListCustomObjectRecordEventsFilter
 } from "@models/index";
 import { IClient } from "@models/zaf-client";
 
@@ -371,6 +374,49 @@ export class CustomObjectService {
             contentType: CONTENT_TYPE,
             data: JSON.stringify(job)
         });
+    }
+
+    /**
+     * List events for a custom object record
+     *
+     * @param key - The custom object key
+     * @param recordId - The custom object record ID
+     * @param filter - Optional pagination filter
+     * @returns Array of all custom object record events
+     * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_record_events/#list-events-for-custom-object-record
+     */
+    public async listCustomObjectRecordEvents(
+        key: string,
+        recordId: string,
+        filter?: IListCustomObjectRecordEventsFilter
+    ): Promise<ICustomObjectRecordEvent[]> {
+        let hasMore = true;
+        let data: IListCustomObjectRecordEventsFilter = filter ?? {};
+        let events: ICustomObjectRecordEvent[] = [];
+
+        do {
+            const response = await this.client.request<IListCustomObjectRecordEventsResponse>({
+                url: `/api/v2/custom_objects/${key}/records/${recordId}/events`,
+                type: "GET",
+                contentType: CONTENT_TYPE,
+                data
+            });
+
+            events = [...events, ...response.custom_object_record_events];
+
+            hasMore = response.meta.has_more;
+            if (hasMore) {
+                data = {
+                    ...filter,
+                    page: {
+                        ...filter?.page,
+                        after: response.meta.after_cursor
+                    }
+                };
+            }
+        } while (hasMore);
+
+        return events;
     }
 
     /**
