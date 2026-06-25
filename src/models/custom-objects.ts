@@ -364,4 +364,10 @@ export interface IListCustomObjectRecordEventsResponse {
     };
 }
 
-export type IListCustomObjectRecordEventsFilter = Pick<IPaginationAndSortCursor, "page">;
+// Not reusing IPaginationAndSortCursor because this endpoint expects page.size as a number, not a string.
+export interface IListCustomObjectRecordEventsFilter {
+    page?: {
+        after?: string;
+        size?: number;
+    };
+}
