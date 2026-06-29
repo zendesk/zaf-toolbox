@@ -128,7 +128,7 @@ export enum ListCutomObjectRecordsSortingOptions {
     MINUS_UPDATED_AT = "-updated_at"
 }
 
-interface IPaginationAndSortCursor {
+export interface IPaginationAndSortCursor {
     page?: {
         /**
          * A pagination cursor that tells the endpoint which page to start on. Note: page[before] and page[after] can't be used together in the same request.
@@ -212,7 +212,7 @@ export interface ICreateCustomObjectRecordBodyWithExternalId<T extends ICustomOb
 /**
  * API Responses
  */
-interface IZendeskMeta {
+export interface IZendeskMeta {
     after_cursor: string;
     before_cursor: string;
     has_more: boolean;
@@ -324,5 +324,50 @@ export interface IBulkJobResponse {
         "status": string;
         "total": number;
         "url": string;
+    };
+}
+
+/**
+ * Custom Object Record Events
+ */
+export interface ICustomObjectRecordEventActor {
+    user_id: number;
+}
+
+export interface ICustomObjectRecordTransactionEvent {
+    type: string;
+    field_key: string;
+    previous_value: string;
+    current_value: string;
+    origin: string;
+}
+
+export interface ICustomObjectRecordEvent {
+    id: string;
+    type: "record_created" | "record_updated";
+    source: string;
+    description: string;
+    actor: ICustomObjectRecordEventActor;
+    created_at: string;
+    received_at: string;
+    properties: {
+        transaction_events: ICustomObjectRecordTransactionEvent[];
+    };
+}
+
+export interface IListCustomObjectRecordEventsResponse {
+    custom_object_record_events: ICustomObjectRecordEvent[];
+    meta: IZendeskMeta;
+    links: {
+        next: string;
+        prev: string;
+    };
+}
+
+// Not reusing IPaginationAndSortCursor because this endpoint expects page.size as a number, not a string.
+export interface IListCustomObjectRecordEventsFilter {
+    page?: {
+        after?: string;
+        size?: number;
     };
 }

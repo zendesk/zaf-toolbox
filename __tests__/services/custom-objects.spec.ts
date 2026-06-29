@@ -3,7 +3,8 @@ import {
     CustomObjectFieldType,
     ListCutomObjectRecordsSortingOptions,
     RecordBulkAction,
-    IBulkJobBodyCreate
+    IBulkJobBodyCreate,
+    ICustomObjectRecordEvent
 } from "@models/custom-objects";
 import { CustomObjectService } from "@services/index";
 import { IClient } from "@models/zaf-client";
@@ -603,6 +604,138 @@ describe("CustomObjectService", () => {
                 data: JSON.stringify(body)
             });
             expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("CustomObjectRecordEvents", () => {
+        const recordEvent: ICustomObjectRecordEvent = {
+            id: "event_1",
+            type: "record_created",
+            source: "zendesk",
+            description: "Record created",
+            actor: { user_id: 12345 },
+            created_at: "2024-03-01T10:00:00Z",
+            received_at: "2024-03-01T10:00:01Z",
+            properties: {
+                transaction_events: [
+                    {
+                        type: "create",
+                        field_key: "name",
+                        previous_value: "",
+                        current_value: "Test Record",
+                        origin: "api"
+                    }
+                ]
+            }
+        };
+
+        it("should call list events with the correct parameters", async () => {
+            requestMock.mockResolvedValueOnce({
+                custom_object_record_events: [recordEvent],
+                meta: { has_more: false, after_cursor: "", before_cursor: "" },
+                links: { next: "", prev: "" }
+            });
+
+            await service.listCustomObjectRecordEvents("foo", "record_id");
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {}
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("should call list events with pagination filter", async () => {
+            requestMock.mockResolvedValueOnce({
+                custom_object_record_events: [recordEvent],
+                meta: { has_more: false, after_cursor: "", before_cursor: "" },
+                links: { next: "", prev: "" }
+            });
+
+            await service.listCustomObjectRecordEvents("foo", "record_id", {
+                page: { size: 10 }
+            });
+
+            expect(requestMock).toHaveBeenCalledWith({
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    page: { size: 10 }
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+        });
+
+        it("should paginate through all events when has_more is true", async () => {
+            requestMock
+                .mockResolvedValueOnce({
+                    custom_object_record_events: [recordEvent],
+                    meta: { has_more: true, after_cursor: "cursor_1", before_cursor: "" },
+                    links: { next: "next_url", prev: "" }
+                })
+                .mockResolvedValueOnce({
+                    custom_object_record_events: [{ ...recordEvent, id: "event_2" }],
+                    meta: { has_more: false, after_cursor: "", before_cursor: "" },
+                    links: { next: "", prev: "" }
+                });
+
+            const result = await service.listCustomObjectRecordEvents("foo", "record_id");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {}
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    page: { after: "cursor_1" }
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(2);
+            expect(result).toHaveLength(2);
+        });
+
+        it("should keep page size through all pages", async () => {
+            requestMock
+                .mockResolvedValueOnce({
+                    custom_object_record_events: [recordEvent],
+                    meta: { has_more: true, after_cursor: "cursor_1", before_cursor: "" },
+                    links: { next: "next_url", prev: "" }
+                })
+                .mockResolvedValueOnce({
+                    custom_object_record_events: [{ ...recordEvent, id: "event_2" }],
+                    meta: { has_more: false, after_cursor: "", before_cursor: "" },
+                    links: { next: "", prev: "" }
+                });
+
+            await service.listCustomObjectRecordEvents("foo", "record_id", {
+                page: { size: 5 }
+            });
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    page: { size: 5 }
+                }
+            });
+            expect(requestMock).toHaveBeenNthCalledWith(2, {
+                url: `/api/v2/custom_objects/foo/records/record_id/events`,
+                type: "GET",
+                contentType: "application/json",
+                data: {
+                    page: { size: 5, after: "cursor_1" }
+                }
+            });
+            expect(requestMock).toHaveBeenCalledTimes(2);
         });
     });
 });

@@ -12,13 +12,16 @@ import {
     ICustomObjectRecord,
     ListCutomObjectRecordsSortingOptions,
     ICustomObjectRecordField,
-    ISearchCustomObjectRecordsFilter,
     IBulkJobResponse,
     IBulkJobBody,
     ISearchFilterCustomObjectRecords,
     ISetCustomObjectRecordFieldBody,
     IUpdateCustomObjectFieldAutonumberingPropertiesBody,
-    IUpdateCustomObjectFieldBody
+    IUpdateCustomObjectFieldBody,
+    ICustomObjectRecordEvent,
+    IListCustomObjectRecordEventsResponse,
+    IListCustomObjectRecordEventsFilter,
+    IZendeskMeta
 } from "@models/index";
 import { IClient } from "@models/zaf-client";
 
@@ -171,9 +174,12 @@ export class CustomObjectService {
         key: string,
         sortOptions?: { sort: ListCutomObjectRecordsSortingOptions }
     ): Promise<ICustomObjectRecord<T>[]> {
-        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records`, {
-            sort: sortOptions?.sort
-        });
+        return this.fetchAllPaginatedRecords<ICustomObjectRecord<T>, IListCustomObjectRecordsResponse<T>>(
+            `/api/v2/custom_objects/${key}/records`,
+            sortOptions ? { sort: sortOptions.sort } : {},
+            "GET",
+            (r) => r.custom_object_records
+        );
     }
 
     /**
@@ -280,9 +286,12 @@ export class CustomObjectService {
      * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_records/#search-custom-object-records
      */
     public async searchRecords<T extends ICustomObjectRecordField>(key: string, query: string) {
-        return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, {
-            query
-        } as ISearchCustomObjectRecordsFilter);
+        return this.fetchAllPaginatedRecords<ICustomObjectRecord<T>, IListCustomObjectRecordsResponse<T>>(
+            `/api/v2/custom_objects/${key}/records/search`,
+            { query },
+            "GET",
+            (r) => r.custom_object_records
+        );
     }
 
     /**
@@ -344,7 +353,12 @@ export class CustomObjectService {
         fetchAllPages = true
     ): Promise<ICustomObjectRecord<T>[] | IListCustomObjectRecordsResponse<T>> {
         if (fetchAllPages) {
-            return this.fetchAllPaginatedRecords<T>(`/api/v2/custom_objects/${key}/records/search`, filter, "POST");
+            return this.fetchAllPaginatedRecords<ICustomObjectRecord<T>, IListCustomObjectRecordsResponse<T>>(
+                `/api/v2/custom_objects/${key}/records/search`,
+                filter,
+                "POST",
+                (r) => r.custom_object_records
+            );
         } else {
             return this.client.request<IListCustomObjectRecordsResponse<T>>({
                 url: `/api/v2/custom_objects/${key}/records/search`,
@@ -374,21 +388,45 @@ export class CustomObjectService {
     }
 
     /**
+     * List events for a custom object record
+     *
+     * @param key - The custom object key
+     * @param recordId - The custom object record ID
+     * @param filter - Optional pagination filter
+     * @returns Array of all custom object record events
+     * @see https://developer.zendesk.com/api-reference/custom-data/custom-objects/custom_object_record_events/#list-events-for-custom-object-record
+     */
+    public async listCustomObjectRecordEvents(
+        key: string,
+        recordId: string,
+        filter?: IListCustomObjectRecordEventsFilter
+    ): Promise<ICustomObjectRecordEvent[]> {
+        return this.fetchAllPaginatedRecords<ICustomObjectRecordEvent, IListCustomObjectRecordEventsResponse>(
+            `/api/v2/custom_objects/${key}/records/${recordId}/events`,
+            filter ?? {},
+            "GET",
+            (r) => r.custom_object_record_events
+        );
+    }
+
+    /**
      * Generic method to fetch all records using pagination
      *
      * @param url - The API endpoint URL
      * @param initialData - Initial request data
-     * @param getNextPageData - Function to build the next page request data
-     * @returns Array of all fetched records
+     * @param method - HTTP method
+     * @param extractor - Function to extract items from the response
+     * @returns Array of all fetched items
      */
-    private async fetchAllPaginatedRecords<T extends ICustomObjectRecordField>(
+    private async fetchAllPaginatedRecords<TItem, TResponse extends { meta: IZendeskMeta }>(
         url: string,
-        initialData: IListFilter | ISearchFilterCustomObjectRecords,
-        method: "GET" | "POST" | "PATCH" | "DELETE" = "GET"
-    ): Promise<ICustomObjectRecord<T>[]> {
+        initialData: object,
+        method: "GET" | "POST" | "PATCH" | "DELETE",
+        extractor: (response: TResponse) => TItem[]
+    ): Promise<TItem[]> {
         let hasMore = true;
         let d = initialData;
-        let objects: ICustomObjectRecord<T>[] = [];
+        let items: TItem[] = [];
 
         do {
             let options: {
@@ -410,21 +448,22 @@ export class CustomObjectService {
                 };
             }
 
-            const response = await this.client.request<IListCustomObjectRecordsResponse<T>>(options);
+            const response = await this.client.request<TResponse>(options);
 
-            objects = [...objects, ...response.custom_object_records];
+            items = [...items, ...extractor(response)];
 
             hasMore = response.meta.has_more;
             if (hasMore) {
                 d = {
                     ...initialData,
                     page: {
+                        ...((initialData as Record<string, unknown>).page as object),
                         after: response.meta.after_cursor
                     }
                 };
             }
         } while (hasMore);
 
-        return objects;
+        return items;
     }
 }
