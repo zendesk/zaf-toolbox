@@ -31,10 +31,7 @@ export enum TemplateComponentTypes {
 }
 
 export type ITemplateComponent =
-    | ITemplateHeaderComponent
-    | ITemplateBodyComponent
-    | ITemplateButtonComponent
-    | ITemplateFooterComponent;
+    ITemplateHeaderComponent | ITemplateBodyComponent | ITemplateButtonComponent | ITemplateFooterComponent;
 
 interface ITemplateComponentBase {
     "type": TemplateComponentTypes;
@@ -166,10 +163,7 @@ export interface ITemplateButtonComponentParameters extends ITemplateBaseCompone
 }
 
 export type ITemplateParameter =
-    | ITemplateTextParameter
-    | ITemplateImageParameter
-    | ITemplateVideoParameter
-    | ITemplateDocumentParameter;
+    ITemplateTextParameter | ITemplateImageParameter | ITemplateVideoParameter | ITemplateDocumentParameter;
 
 interface ITemplateParameterBase {
     type: string;

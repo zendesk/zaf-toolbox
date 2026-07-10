@@ -56,12 +56,7 @@ type MetadataValue = string | number | boolean;
 export type IMetadata = Record<string, MetadataValue | undefined>;
 
 export type IAction =
-    | IBuyAction
-    | ILinkAction
-    | ILocationRequestAction
-    | IPostbackAction
-    | IReplyAction
-    | IWebviewAction;
+    IBuyAction | ILinkAction | ILocationRequestAction | IPostbackAction | IReplyAction | IWebviewAction;
 
 export { IBuyAction, ILinkAction, ILocationRequestAction, IPostbackAction, IReplyAction, IWebviewAction };
 
