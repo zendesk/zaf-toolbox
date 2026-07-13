@@ -44,7 +44,7 @@
         "@testing-library/jest-dom": "^6.9.1",
         "@types/gulp": "^4.0.18",
         "@types/jest": "^30.0.0",
-        "@types/node": "^24.9.1",
+        "@types/node": "^26.1.1",
         "@types/react": "^19.2.16",
         "@typescript-eslint/parser": "^8.63.0",
         "del": "^8.0.1",
