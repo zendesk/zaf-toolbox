@@ -46,7 +46,7 @@
         "@types/jest": "^30.0.0",
         "@types/node": "^26.1.1",
         "@types/react": "^19.2.16",
-        "@typescript-eslint/parser": "^8.63.0",
+        "@typescript-eslint/parser": "^8.64.0",
         "del": "^8.0.1",
         "eslint": "^9.39.2",
         "eslint-config-prettier": "^10.1.8",
