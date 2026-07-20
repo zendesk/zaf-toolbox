@@ -424,7 +424,7 @@ export class CustomObjectService {
         method: "GET" | "POST" | "PATCH" | "DELETE",
         extractor: (response: TResponse) => TItem[]
     ): Promise<TItem[]> {
-        let hasMore = true;
+        let hasMore: boolean;
         let d = initialData;
         let items: TItem[] = [];
 
