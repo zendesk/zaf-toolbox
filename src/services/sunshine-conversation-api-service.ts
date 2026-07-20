@@ -132,7 +132,7 @@ export class SunshineConversationApiService {
      * @throws NotFoundError when the integration id is not found in Sunshine Conversation
      */
     public async getWhatsAppTemplates(whatsAppIntegrationId: string): Promise<ITemplate[]> {
-        let templates: ITemplate[] = [];
+        let templates: ITemplate[];
         let options = this.createV1Options(
             `/apps/${this.settings.appId}/integrations/${whatsAppIntegrationId}/messageTemplates?limit=100`,
             HttpMethod.GET

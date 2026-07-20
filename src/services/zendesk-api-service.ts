@@ -480,7 +480,7 @@ export class ZendeskApiService {
      * @returns {Promise<unknown>} List of Zis job specs
      */
     public async fetchZisJobSpecs(integrationName: string, filterTheList?: IListFilter): Promise<IZisJobspec[]> {
-        let hasMore = true;
+        let hasMore: boolean;
         const numberOfJobSpecs = "100"; // Maximum number of job specs per page
         let jobspecs: IZisJobspec[] = [];
         let data: IListFilter = filterTheList ?? {
