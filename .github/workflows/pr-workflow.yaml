@@ -85,7 +85,7 @@ jobs:
             job_name: "Lint and verify code formatting in the API"
         steps:
             - uses: zendesk/checkout@v7
-            - uses: zendesk/setup-node@v6
+            - uses: zendesk/setup-node@v7
               with:
                   node-version: 20
                   cache: "npm"
@@ -105,7 +105,7 @@ jobs:
             job_name: "Build package"
         steps:
             - uses: zendesk/checkout@v7
-            - uses: zendesk/setup-node@v6
+            - uses: zendesk/setup-node@v7
               with:
                   node-version: 20
                   cache: "npm"
@@ -124,7 +124,7 @@ jobs:
             job_name: "Execute tests"
         steps:
             - uses: zendesk/checkout@v7
-            - uses: zendesk/setup-node@v6
+            - uses: zendesk/setup-node@v7
               with:
                   node-version: 20
                   cache: "npm"
