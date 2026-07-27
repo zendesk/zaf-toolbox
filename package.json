@@ -41,7 +41,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/jest-dom": "^7.0.0",
         "@types/gulp": "^4.0.18",
         "@types/jest": "^30.0.0",
         "@types/node": "^26.1.1",
