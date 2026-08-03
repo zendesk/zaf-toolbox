@@ -1,6 +1,6 @@
 {
     "name": "@zendesk/zaf-toolbox",
-    "version": "1.10.8",
+    "version": "1.10.9",
     "description": "A toolbox for ZAF application built with 🩷 by Zendesk Labs",
     "main": "lib/src/index.js",
     "types": "lib/src/index.d.ts",
@@ -64,7 +64,7 @@
         "ts-node": "^10.9.1",
         "tsc-alias": "^1.8.17",
         "tsconfig-paths": "^4.2.0",
-        "typescript": "^5.9.3",
+        "typescript": "^7.0.2",
         "typescript-eslint": "^8.63.0"
     }
 }
