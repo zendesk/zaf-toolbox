@@ -651,6 +651,37 @@ export class ZendeskApiService {
     }
 
     /**
+     * Creates a ZIS inbound webhook for the given integration, authenticated with the browser
+     * session of the current user instead of an OAuth access token.
+     *
+     * Use this from a Zendesk app when no access token can be created for the integration's OAuth
+     * client (for example when `POST /api/v2/oauth/tokens` is refused). The user must be allowed to
+     * manage the integration, typically an admin.
+     *
+     * ZIS does not check that the integration exists, so pass the exact integration name.
+     *
+     * @param {string} integration_name - The name of the ZIS integration.
+     * @param {string} source_system - The source system for the webhook.
+     * @param {string} event_type - The event type for the webhook.
+     * @returns {Promise<ICreateInboundWebhookResponse>} - The response from the API.
+     */
+    public async createZisInboundWebhookWithSession(
+        integration_name: string,
+        source_system: string,
+        event_type: string
+    ): Promise<ICreateInboundWebhookResponse> {
+        return await this.client.request({
+            url: `/api/services/zis/inbound_webhooks/generic/${integration_name}`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                source_system,
+                event_type
+            })
+        });
+    }
+
+    /**
      * Fetches the ZIS integration by name.
      *
      * @param {string} integrationName - The name of the ZIS integration.

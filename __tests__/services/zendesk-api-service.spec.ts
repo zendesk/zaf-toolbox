@@ -1056,6 +1056,26 @@ describe("ZendeskService", () => {
         });
     });
 
+    describe("createZisInboundWebhookWithSession", () => {
+        it("should create the inbound webhook without an Authorization header", async () => {
+            requestMock.mockResolvedValueOnce({ path: "/ingest/path", username: "user", password: "pass" });
+
+            const result = await service.createZisInboundWebhookWithSession("integrationName", "source", "eventType");
+
+            expect(requestMock).toHaveBeenNthCalledWith(1, {
+                url: "/api/services/zis/inbound_webhooks/generic/integrationName",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    source_system: "source",
+                    event_type: "eventType"
+                })
+            });
+            expect(requestMock).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({ path: "/ingest/path", username: "user", password: "pass" });
+        });
+    });
+
     describe("listZisInboundWebhooks", () => {
         const inboundWebhookSample = {
             id: "1",
