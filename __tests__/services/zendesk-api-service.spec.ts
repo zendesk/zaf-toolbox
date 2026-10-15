@@ -1037,8 +1037,8 @@ describe("ZendeskService", () => {
     });
 
     describe("createZisInboundWebhook", () => {
-        it("should create an access token with the correct data", async () => {
-            await service.createZisInboundWebhook("integrationName", "token", "source", "eventType");
+        it("should send the token as a bearer token when given", async () => {
+            await service.createZisInboundWebhook("integrationName", "source", "eventType", "token");
 
             expect(requestMock).toHaveBeenNthCalledWith(1, {
                 url: "/api/services/zis/inbound_webhooks/generic/integrationName",
@@ -1054,13 +1054,11 @@ describe("ZendeskService", () => {
             });
             expect(requestMock).toHaveBeenCalledTimes(1);
         });
-    });
 
-    describe("createZisInboundWebhookWithSession", () => {
-        it("should create the inbound webhook without an Authorization header", async () => {
+        it("should rely on the browser session, with no Authorization header, without a token", async () => {
             requestMock.mockResolvedValueOnce({ path: "/ingest/path", username: "user", password: "pass" });
 
-            const result = await service.createZisInboundWebhookWithSession("integrationName", "source", "eventType");
+            const result = await service.createZisInboundWebhook("integrationName", "source", "eventType");
 
             expect(requestMock).toHaveBeenNthCalledWith(1, {
                 url: "/api/services/zis/inbound_webhooks/generic/integrationName",

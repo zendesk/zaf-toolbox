@@ -624,56 +624,29 @@ export class ZendeskApiService {
     /**
      * Creates a ZIS inbound webhook for the given integration.
      *
-     * @param {string} integration_name - The name of the ZIS integration.
-     * @param {string} token - The token for the webhook.
-     * @param {string} source_system - The source system for the webhook.
-     * @param {string} event_type - The event type for the webhook.
-     * @returns {Promise<ICreateInboundWebhookResponse>} - The response from the API.
-     */
-    public async createZisInboundWebhook(
-        integration_name: string,
-        token: string,
-        source_system: string,
-        event_type: string
-    ): Promise<ICreateInboundWebhookResponse> {
-        return await this.client.request({
-            url: `/api/services/zis/inbound_webhooks/generic/${integration_name}`,
-            type: "POST",
-            contentType: "application/json",
-            headers: {
-                Authorization: `Bearer ${token}`
-            },
-            data: JSON.stringify({
-                source_system,
-                event_type
-            })
-        });
-    }
-
-    /**
-     * Creates a ZIS inbound webhook for the given integration, authenticated with the browser
-     * session of the current user instead of an OAuth access token.
-     *
-     * Use this from a Zendesk app when no access token can be created for the integration's OAuth
-     * client (for example when `POST /api/v2/oauth/tokens` is refused). The user must be allowed to
-     * manage the integration, typically an admin.
+     * Without a token, the request is authenticated with the browser session of the current user
+     * (typically an admin), which works when no access token can be created for the integration's
+     * OAuth client (for example when `POST /api/v2/oauth/tokens` is refused).
      *
      * ZIS does not check that the integration exists, so pass the exact integration name.
      *
      * @param {string} integration_name - The name of the ZIS integration.
      * @param {string} source_system - The source system for the webhook.
      * @param {string} event_type - The event type for the webhook.
+     * @param {string} [token] - Optional OAuth access token for the integration, sent as a bearer token.
      * @returns {Promise<ICreateInboundWebhookResponse>} - The response from the API.
      */
-    public async createZisInboundWebhookWithSession(
+    public async createZisInboundWebhook(
         integration_name: string,
         source_system: string,
-        event_type: string
+        event_type: string,
+        token?: string
     ): Promise<ICreateInboundWebhookResponse> {
         return await this.client.request({
             url: `/api/services/zis/inbound_webhooks/generic/${integration_name}`,
             type: "POST",
             contentType: "application/json",
+            ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
             data: JSON.stringify({
                 source_system,
                 event_type
